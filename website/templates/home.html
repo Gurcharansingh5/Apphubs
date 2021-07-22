@@ -1,6 +1,11 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
 %}
 <h1 align="center">Notes</h1>
+{% if user.fb_access_token  %}
+<a class="nav-item nav-link" id="home" href="/">FB Logged IN</a>
+{% else %}
+<a class="nav-item nav-link" id="login" href="/fb-login">Connect facebook</a>
+{% endif %}
 <ul class="list-group list-group-flush" id="notes">
   {% for note in user.notes %}
   <li class="list-group-item">
