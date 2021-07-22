@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, flash, jsonify,redirect
+from flask import Blueprint, render_template, request, flash, jsonify,redirect,url_for
 from flask_login import login_required, current_user
-from .models import Note
+from .models import Note,User
 from . import db
 import json
 import requests_oauthlib
@@ -20,8 +20,7 @@ views = Blueprint('views', __name__)
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    print('current user')
-    print(current_user)
+
     if request.method == 'POST':
         note = request.form.get('note')
 
@@ -57,37 +56,22 @@ def fblogin():
 
 @views.route("/fb-callback")
 def callback():
-	facebook = requests_oauthlib.OAuth2Session(
+    print('current user')
+    print(current_user.email)
+    facebook = requests_oauthlib.OAuth2Session(
     	FB_CLIENT_ID, scope=FB_SCOPE, redirect_uri=URL + "/fb-callback"
 	)
 
 	# we need to apply a fix for Facebook here
-	facebook = facebook_compliance_fix(facebook)
-
-	token = facebook.fetch_token(
-    	FB_TOKEN_URL,
+    facebook = facebook_compliance_fix(facebook)
+    token = facebook.fetch_token(FB_TOKEN_URL,
     	client_secret=FB_CLIENT_SECRET,
     	authorization_response=request.url,
 	)
+    print(token)
+    user = User.query.filter_by(email=current_user.email).first()
+    user.fb_access_token = token['access_token']
+    db.session.commit()
 
-	print(token)
+    return redirect(url_for('views.home'))
 
-	# Fetch a protected resource, i.e. user profile, via Graph API
-
-	facebook_user_data = facebook.get(
-    	"https://graph.facebook.com/me?fields=id,name,email,picture{url}"
-	).json()
-
-	print('facebook_user_data')
-	print(facebook_user_data)
-	email = facebook_user_data["email"]
-	name = facebook_user_data["name"]
-	picture_url = facebook_user_data.get("picture", {}).get("data", {}).get("url")
-
-	return f"""
-	User information: <br>
-	Name: {name} <br>
-	Email: {email} <br>
-	Avatar <img src="{picture_url}"> <br>
-	<a href="/">Home</a>
-	"""
