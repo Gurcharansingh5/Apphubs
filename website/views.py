@@ -6,7 +6,7 @@ import json
 import requests_oauthlib
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 from . import config
-
+import dropbox
 
 
 FB_CLIENT_ID=2256808184449973    
@@ -14,15 +14,13 @@ FB_CLIENT_SECRET="bc5fa70ff4ff8dd693f804ba4f0db80c"
 FB_AUTHORIZATION_BASE_URL = "https://www.facebook.com/dialog/oauth"
 FB_TOKEN_URL = "https://graph.facebook.com/oauth/access_token"
 FB_SCOPE = ["email"]
-URL = "https://911ffec4b3b1.ngrok.io "
+URL = "https://e60817398c01.ngrok.io"
 
 views = Blueprint('views', __name__)
-
 
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-
     if request.method == 'POST':
         note = request.form.get('note')
 
@@ -33,8 +31,8 @@ def home():
             db.session.add(new_note)
             db.session.commit()
             flash('Note added!', category='success')
-
-    return render_template("home.html", user=current_user)
+    readyfolderpaths = findReadyFolderPaths()
+    return render_template("home.html", user=current_user,paths=readyfolderpaths)
 
 
 @views.route('/delete-note', methods=['POST'])
@@ -99,3 +97,21 @@ def dropbox_authorized():
     db.session.commit()
 
     return redirect(url_for('views.home'))
+
+
+# function for checking if Ready folder exists
+def findReadyFolderPaths():
+    user = User.query.filter_by(email=current_user.email).first()
+    dbx = dropbox.Dropbox(user.dropbox_access_token)    
+    print("[SUCCESS] dropbox account linked")
+    ready_campaign_path = []
+    for entry in dbx.files_list_folder('/superlucky/').entries:
+        for subEntry in dbx.files_list_folder('/superlucky/'+entry.name).entries:
+            if subEntry.name == 'READY':
+                print(subEntry.name)
+                for subsubEntry in dbx.files_list_folder('/superlucky/'+entry.name+'/'+subEntry.name).entries:
+                    ready_campaign_path.append(subsubEntry.path_display) 
+    print(ready_campaign_path)
+    return ready_campaign_path
+    
+    

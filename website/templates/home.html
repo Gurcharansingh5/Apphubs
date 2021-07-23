@@ -14,6 +14,13 @@
 <a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
 {% endif %} 
 
+
+<ul class="list-group list-group-flush">
+  {% for path in paths %}
+  <li class="list-group-item">{{path}}</li>
+  {% endfor %}
+</ul>
+
 <ul class="list-group list-group-flush" id="notes">
   {% for note in user.notes %}
   <li class="list-group-item">
