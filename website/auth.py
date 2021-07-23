@@ -1,17 +1,18 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for,session
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
+from flask_bootstrap import Bootstrap
+from oauthlib.oauth2 import WebApplicationClient
+import requests,json
+import os
 GOOGLE_CLIENT_ID = "75718528531-dbbvsoetgeivfmk7ij7hr9n4bcg3a16t.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "VPuy2dSYJJjZ3A0jwUvlV8-Q"
 GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
-from flask_bootstrap import Bootstrap
-from oauthlib.oauth2 import WebApplicationClient
-import requests,json
-import os
+
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
@@ -151,14 +152,15 @@ def callback():
         print(users_email)
         db.session.add(new_user)
         db.session.commit()
+        login_user(new_user, remember=True)
 
-    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+
 
     # # Begin user session by logging the user in
     login_user(user, remember=True)
-    print('hfasduhsohos')
 
     # Send user back to homepage
     return redirect(url_for('views.home'))
 
     # return redirect(url_for("index"))
+

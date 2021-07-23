@@ -1,10 +1,12 @@
-from flask import Blueprint, render_template, request, flash, jsonify,redirect,url_for
+from flask import Blueprint, render_template, request, flash, jsonify,redirect,url_for,session
 from flask_login import login_required, current_user
 from .models import Note,User
 from . import db
 import json
 import requests_oauthlib
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
+from . import config
+
 
 
 FB_CLIENT_ID=2256808184449973    
@@ -12,7 +14,7 @@ FB_CLIENT_SECRET="bc5fa70ff4ff8dd693f804ba4f0db80c"
 FB_AUTHORIZATION_BASE_URL = "https://www.facebook.com/dialog/oauth"
 FB_TOKEN_URL = "https://graph.facebook.com/oauth/access_token"
 FB_SCOPE = ["email"]
-URL = "https://45064934bf8a.ngrok.io"
+URL = "https://911ffec4b3b1.ngrok.io "
 
 views = Blueprint('views', __name__)
 
@@ -75,3 +77,25 @@ def callback():
 
     return redirect(url_for('views.home'))
 
+@views.route('/dropboxlogin')
+def dropboxlogin():
+
+    print(url_for('views.dropbox_authorized'))
+    return config.dropbox.authorize(callback='https://911ffec4b3b1.ngrok.io/login/authorized')
+    
+@views.route('/login/authorized')
+def dropbox_authorized():
+    resp = config.dropbox.authorized_response()
+    if resp is None:
+        return 'Access denied: reason=%s error=%s' % (
+            request.args['error'],
+            request.args['error_description']
+        )
+    print(resp)
+    session['dropbox_token'] = (resp['access_token'], '')
+    print(session['dropbox_token'])
+    user = User.query.filter_by(email=current_user.email).first()
+    user.dropbox_access_token = resp['access_token']
+    db.session.commit()
+
+    return redirect(url_for('views.home'))

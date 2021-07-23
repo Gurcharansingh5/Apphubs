@@ -2,10 +2,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
-
+from flask_oauthlib.client import OAuth
+from . import config
 db = SQLAlchemy()
 DB_NAME = "database.db"
-
 
 def create_app():
     app = Flask(__name__)
@@ -31,6 +31,19 @@ def create_app():
     def load_user(id):
         return User.query.get(str(id))
 
+    oauth = OAuth(app)
+    config.dropbox = oauth.remote_app(
+    'dropbox',
+    consumer_key='j3x8xr8e9aqg1gb',
+    consumer_secret='kn7mpqs64v0ac8y',
+    request_token_params={},
+    base_url='https://www.dropbox.com/1/',
+    request_token_url=None,
+    access_token_method='POST',
+    access_token_url='https://api.dropbox.com/1/oauth2/token',
+    authorize_url='https://www.dropbox.com/1/oauth2/authorize',
+    ) 
+
     return app
 
 
@@ -38,3 +51,7 @@ def create_database(app):
     if not path.exists('website/' + DB_NAME):
         db.create_all(app=app)
         print('Created Database!')
+
+
+    
+ 

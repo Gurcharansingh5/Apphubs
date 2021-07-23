@@ -1,11 +1,19 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
 %}
 <h1 align="center">Notes</h1>
+
 {% if user.fb_access_token  %}
-<a class="nav-item nav-link" id="home" href="/">FB Logged IN</a>
+<p>FB Logged IN</p>
 {% else %}
 <a class="nav-item nav-link" id="login" href="/fb-login">Connect facebook</a>
 {% endif %}
+
+{% if user.dropbox_access_token  %}
+<p>Dropbox Logged IN</p>
+{% else %}
+<a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
+{% endif %} 
+
 <ul class="list-group list-group-flush" id="notes">
   {% for note in user.notes %}
   <li class="list-group-item">
