@@ -34,10 +34,10 @@ def home():
     user = User.query.filter_by(email=current_user.email).first()
 
     if user.dropbox_access_token:
-        readyCampaigns,readyfolderpaths = findReadyFolderPaths()
+        readyfolderpaths = findReadyFolderPaths()
         print(readyfolderpaths)
         print(type(readyfolderpaths))
-        return render_template("home.html", user=current_user,paths=readyCampaigns,readyfolderpaths=)
+        return render_template("home.html", user=current_user,paths=readyfolderpaths)
 
     return render_template("home.html", user=current_user,paths=[])
 
@@ -133,6 +133,6 @@ def findReadyFolderPaths():
 
     print(ready_campaign_path)
     print(campaign)
-    return campaign,ready_campaign_path
+    return campaign
     
 
