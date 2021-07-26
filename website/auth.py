@@ -145,6 +145,8 @@ def callback():
 
 
     user = User.query.filter_by(email=users_email).first()
+    print('89898989898989898')
+    print(user)
     if not user:
         print('no user ')
         password1 = '121212122'
@@ -153,11 +155,9 @@ def callback():
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user, remember=True)
-
-
-
+    else:
     # # Begin user session by logging the user in
-    login_user(user, remember=True)
+        login_user(user, remember=True)
 
     # Send user back to homepage
     return redirect(url_for('views.home'))

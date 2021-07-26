@@ -8,13 +8,12 @@ from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 from . import config
 import dropbox
 
-
 FB_CLIENT_ID=2256808184449973    
 FB_CLIENT_SECRET="bc5fa70ff4ff8dd693f804ba4f0db80c"
 FB_AUTHORIZATION_BASE_URL = "https://www.facebook.com/dialog/oauth"
 FB_TOKEN_URL = "https://graph.facebook.com/oauth/access_token"
-FB_SCOPE = ["email"]
-URL = "https://e60817398c01.ngrok.io"
+FB_SCOPE = ["email","ads_management"]
+URL = "https://b1d561030406.ngrok.io" #update line 82 as well
 
 views = Blueprint('views', __name__)
 
@@ -31,9 +30,16 @@ def home():
             db.session.add(new_note)
             db.session.commit()
             flash('Note added!', category='success')
-    readyfolderpaths = findReadyFolderPaths()
-    return render_template("home.html", user=current_user,paths=readyfolderpaths)
 
+    user = User.query.filter_by(email=current_user.email).first()
+
+    if user.dropbox_access_token:
+        readyCampaigns,readyfolderpaths = findReadyFolderPaths()
+        print(readyfolderpaths)
+        print(type(readyfolderpaths))
+        return render_template("home.html", user=current_user,paths=readyCampaigns,readyfolderpaths=)
+
+    return render_template("home.html", user=current_user,paths=[])
 
 @views.route('/delete-note', methods=['POST'])
 def delete_note():
@@ -64,10 +70,7 @@ def callback():
 
 	# we need to apply a fix for Facebook here
     facebook = facebook_compliance_fix(facebook)
-    token = facebook.fetch_token(FB_TOKEN_URL,
-    	client_secret=FB_CLIENT_SECRET,
-    	authorization_response=request.url,
-	)
+    token = facebook.fetch_token(FB_TOKEN_URL, client_secret=FB_CLIENT_SECRET, authorization_response=request.url)
     print(token)
     user = User.query.filter_by(email=current_user.email).first()
     user.fb_access_token = token['access_token']
@@ -79,7 +82,7 @@ def callback():
 def dropboxlogin():
 
     print(url_for('views.dropbox_authorized'))
-    return config.dropbox.authorize(callback='https://911ffec4b3b1.ngrok.io/login/authorized')
+    return config.dropbox.authorize(callback='https://b1d561030406.ngrok.io/login/authorized')
     
 @views.route('/login/authorized')
 def dropbox_authorized():
@@ -101,6 +104,8 @@ def dropbox_authorized():
 
 # function for checking if Ready folder exists
 def findReadyFolderPaths():
+    campaign={}
+
     user = User.query.filter_by(email=current_user.email).first()
     dbx = dropbox.Dropbox(user.dropbox_access_token)    
     print("[SUCCESS] dropbox account linked")
@@ -108,10 +113,26 @@ def findReadyFolderPaths():
     for entry in dbx.files_list_folder('/superlucky/').entries:
         for subEntry in dbx.files_list_folder('/superlucky/'+entry.name).entries:
             if subEntry.name == 'READY':
-                print(subEntry.name)
-                for subsubEntry in dbx.files_list_folder('/superlucky/'+entry.name+'/'+subEntry.name).entries:
-                    ready_campaign_path.append(subsubEntry.path_display) 
+                print(subEntry.name)      
+
+                for campaigns in dbx.files_list_folder('/superlucky/'+entry.name+'/'+subEntry.name).entries:
+                    print(campaigns.name)                    
+                    ready_campaign_path.append(campaigns.path_display) 
+
+                    adset={}
+                    for adsets in dbx.files_list_folder('/superlucky/'+entry.name+'/'+subEntry.name+'/'+campaigns.name).entries:
+                        print(adsets.name)              
+                        adcreative=[]
+                        for adcreatives in dbx.files_list_folder('/superlucky/'+entry.name+'/'+subEntry.name+'/'+campaigns.name+'/'+adsets.name).entries:
+                            print(adcreatives.name)
+                            adcreative.append(adcreatives.name)
+
+                        adset[adsets.name] = adcreative
+                    campaign[campaigns.name] = adset
+
+
     print(ready_campaign_path)
-    return ready_campaign_path
+    print(campaign)
+    return campaign,ready_campaign_path
     
-    
+

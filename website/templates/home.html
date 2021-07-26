@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
 %}
-<h1 align="center">Notes</h1>
+<!-- <h1 align="center">Notes</h1> -->
 
 {% if user.fb_access_token  %}
 <p>FB Logged IN</p>
@@ -13,14 +13,27 @@
 {% else %}
 <a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
 {% endif %} 
-
-
+{{readyfolderpaths}}
 <ul class="list-group list-group-flush">
-  {% for path in paths %}
-  <li class="list-group-item">{{path}}</li>
-  {% endfor %}
-</ul>
+  <form method="POST">
+    {% for camp, adsets in paths.items() %}
 
+    <button type="submit" class="btn btn-primary">Launch</button>
+      {{camp}}:
+        {% for ad, items in adsets.items() %}
+          {{ad}}
+          {% for item in items %}
+            {{ item }}<br>
+          {% endfor %}
+        {% endfor %}
+
+      <br>
+      <br>
+    {% endfor %}
+  </form>
+
+</ul>
+<!-- 
 <ul class="list-group list-group-flush" id="notes">
   {% for note in user.notes %}
   <li class="list-group-item">
@@ -37,5 +50,5 @@
   <div align="center">
     <button type="submit" class="btn btn-primary">Add Note</button>
   </div>
-</form>
+</form> -->
 {% endblock %}
