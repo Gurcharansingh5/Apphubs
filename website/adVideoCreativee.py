@@ -7,13 +7,13 @@ from facebook_business.adobjects.advideo import AdVideo
 session = FacebookSession(
     2256808184449973,
     'bc5fa70ff4ff8dd693f804ba4f0db80c',
-    'EAAgEjhopC7UBANIosjWMEPQ9isBFf9nJsszL0Peu5HBCw8iB84jdgT8tKemhzatMh40HZC3fzBqBrFZA42WX6vee4RGAAYiHhG94wb0e9tkgWKdf3DfX5VDPZAc2PZBU5aKZBAHejluTm4988RPCWqn3OmcAbLZC6QmQk4WAaYMacQdyKJGKyZB',
+    'EAAgEjhopC7UBAHALZAGMXxCFdi9k7vNt8kSikJeYklKHvt5ILzOGuVunItAL2sTkE5Cg8vp2pigUtqlpDOTOGVKZBsUJNaP4h31dxE4fZBnmLN22GFAbIXDYxjg54bU0iFJpqYZCk3oSYZBZBf1pdftIVwZC2y4UBL19YPZAnS7PJSZCy1sJeoNJw',
 )
 FacebookAdsApi.set_default_api(FacebookAdsApi(session))
 video = AdVideo(parent_id='act_144169154493518')
 
 def get_video_creative_id_from_file(path):
-    
+
     print('get_video_creative_id_from_file')
     path = path.replace('"\"','/')
     print(path)

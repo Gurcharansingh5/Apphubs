@@ -16,7 +16,7 @@ from facebook_business.api import FacebookAdsApi
 
 from  . adVideoCreativee import get_video_creative_id_from_file
 
-access_token = 'EAAgEjhopC7UBANIosjWMEPQ9isBFf9nJsszL0Peu5HBCw8iB84jdgT8tKemhzatMh40HZC3fzBqBrFZA42WX6vee4RGAAYiHhG94wb0e9tkgWKdf3DfX5VDPZAc2PZBU5aKZBAHejluTm4988RPCWqn3OmcAbLZC6QmQk4WAaYMacQdyKJGKyZB'
+access_token = 'EAAgEjhopC7UBAHALZAGMXxCFdi9k7vNt8kSikJeYklKHvt5ILzOGuVunItAL2sTkE5Cg8vp2pigUtqlpDOTOGVKZBsUJNaP4h31dxE4fZBnmLN22GFAbIXDYxjg54bU0iFJpqYZCk3oSYZBZBf1pdftIVwZC2y4UBL19YPZAnS7PJSZCy1sJeoNJw'
 app_secret = 'bc5fa70ff4ff8dd693f804ba4f0db80c'
 app_id = 2256808184449973 
 id = 'act_144169154493518'
@@ -50,6 +50,11 @@ def home():
         # launch campaign
         launch_campaign(directory_tree)
 
+        user = User.query.filter_by(email=current_user.email).first()
+        dbx = dropbox.Dropbox(user.dropbox_access_token)  
+        launch_folder_path = dropbox_ready_folder.replace('READY','LAUNCHED')
+        dbx.files_move(from_path=dropbox_ready_folder,to_path=launch_folder_path)
+
        
 
     user = User.query.filter_by(email=current_user.email).first()
@@ -60,7 +65,7 @@ def home():
         print(type(readyfolderpaths))
         return render_template("home.html", user=current_user,paths=readyfolderpaths)
 
-    return render_template("home.html", user=current_user,paths=[])
+    return render_template("home.html", user=current_user,paths={})
 
 @views.route('/delete-note', methods=['POST'])
 def delete_note():
@@ -157,7 +162,7 @@ def findReadyFolderPaths():
     # print(campaign)
     return campaign
 
-def downloadCampaignFolder(path,campaign_name='camp2'):
+def downloadCampaignFolder(path,campaign_name='camp1'):
     print("downloadCampaignFolder path path")
     print(path)
     user = User.query.filter_by(email=current_user.email).first()
@@ -175,7 +180,7 @@ def downloadCampaignFolder(path,campaign_name='camp2'):
         print('Extracting all the files now...')
         zip.extractall()
         print('Done!')
-
+    os.remove(folder_path+'/'+file_name)
     #convert directory structure to dict
 
     ready_directory_str = json.dumps(path_to_dict(folder_path+'/'+campaign_name))
@@ -195,6 +200,7 @@ def path_to_dict(path):
     return d
 
 def launch_campaign(campaign):
+
     print('ready directory in launch campaign')
     print(campaign)
 
