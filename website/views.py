@@ -1,20 +1,24 @@
-from functools import partial
-from flask import Blueprint, render_template, request, flash, jsonify,redirect,url_for,session
-from flask_login import login_required, current_user
+# INNER IMPORTS
+from . credentials import FB_AUTHORIZATION_BASE_URL,FB_CLIENT_ID,FB_CLIENT_SECRET,FB_SCOPE,FB_TOKEN_URL,URL
+from  . adVideoCreativee import get_video_creative_id_from_file
+
 from .models import Note,User
 from . import db
+
+# INTERNAL IMPORTS
 import json
+import os
+
+# external imports
+from flask import Blueprint, render_template, request, flash, jsonify,redirect,url_for,session
+from flask_login import login_required, current_user
+from zipfile import ZipFile
+import dropbox
 import requests_oauthlib
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
-from . import config
-import dropbox
-import os
-from zipfile import ZipFile
-# external imports
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.api import FacebookAdsApi
 
-from  . adVideoCreativee import get_video_creative_id_from_file
 
 access_token = 'EAAgEjhopC7UBAHALZAGMXxCFdi9k7vNt8kSikJeYklKHvt5ILzOGuVunItAL2sTkE5Cg8vp2pigUtqlpDOTOGVKZBsUJNaP4h31dxE4fZBnmLN22GFAbIXDYxjg54bU0iFJpqYZCk3oSYZBZBf1pdftIVwZC2y4UBL19YPZAnS7PJSZCy1sJeoNJw'
 app_secret = 'bc5fa70ff4ff8dd693f804ba4f0db80c'
@@ -23,13 +27,6 @@ id = 'act_144169154493518'
 FacebookAdsApi.init(access_token=access_token)
 
 
-
-FB_CLIENT_ID=2256808184449973    
-FB_CLIENT_SECRET="bc5fa70ff4ff8dd693f804ba4f0db80c"
-FB_AUTHORIZATION_BASE_URL = "https://www.facebook.com/dialog/oauth"
-FB_TOKEN_URL = "https://graph.facebook.com/oauth/access_token"
-FB_SCOPE = ["email","ads_management"]
-URL = "https://9ba698e93f61.ngrok.io" #update line 82 as well
 
 views = Blueprint('views', __name__)
 
@@ -60,10 +57,25 @@ def home():
     user = User.query.filter_by(email=current_user.email).first()
 
     if user.dropbox_access_token:
-        readyfolderpaths = findReadyFolderPaths()
-        print(readyfolderpaths)
-        print(type(readyfolderpaths))
-        return render_template("home.html", user=current_user,paths=readyfolderpaths)
+        readyfolderpaths = findReadyFolderPaths()        
+        rows  = []
+        for camp, adsets in readyfolderpaths.items():
+            path = adsets['path']
+            item = {}
+            ad_items = []
+            for adsets, resource in adsets.items():
+                if adsets != 'path':
+                    ad_item = {}
+                    ad_item['adset'] = adsets
+                    ad_item['resource'] = resource
+                    ad_items.append(ad_item)
+            item['camp'] = camp
+            item['path'] = path
+            item['ads'] = ad_items
+            rows.append(item)
+
+        print(rows)
+        return render_template("home.html", user=current_user,rows=rows)
 
     return render_template("home.html", user=current_user,paths={})
 
@@ -108,7 +120,7 @@ def callback():
 def dropboxlogin():
 
     print(url_for('views.dropbox_authorized'))
-    return config.dropbox.authorize(callback='https://9ba698e93f61.ngrok.io/login/authorized')
+    return config.dropbox.authorize(callback=URL+'/login/authorized')
     
 @views.route('/login/authorized')
 def dropbox_authorized():

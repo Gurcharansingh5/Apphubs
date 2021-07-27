@@ -2,65 +2,64 @@
 %}
 <!-- <h1 align="center">Notes</h1> -->
 
-{% if user.fb_access_token  %}
+{% if user.fb_access_token %}
 <p>FB Logged IN</p>
 {% else %}
 <a class="nav-item nav-link" id="login" href="/fb-login">Connect facebook</a>
 {% endif %}
 
-{% if user.dropbox_access_token  %}
+{% if user.dropbox_access_token %}
 <p>Dropbox Logged IN</p>
 {% else %}
 <a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
-{% endif %} 
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">Campaign</th>
-        <th scope="col">Adsets</th>
-        <th scope="col">Creative</th>
-        <th scope="col">Launch</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for camp, adsets in paths.items() %}  
-        <tr>
-          <td>
-            <input type="hidden" value="{{camp}}" name='campaign'>
-            {{camp}}
-          </td>
-
-          {% for adset, creative in adsets.items() %}  
-              {% if adset != 'path' %}
-                <td>
-                    {{adset}}             
-                </td>
-
-                    <td>
-                      {% for ads in creative %}
-                      ({{ads}})
-                      {% endfor %}
-                    </td>
-              {% endif %}
-            {% endfor %}
-          <td>
-            <form method="POST">
-              {% for path,URL in adsets.items() %}  
-
-              {% if path == 'path' %}
-                <input type="hidden" value="{{URL}}" name='path'>
-              {% endif %}
-              {% endfor %}
-              <button class="btn btn-primary">Launch</button>
-            
-            </form>
-          </td>
-        </tr>
-      {% endfor %}
+{% endif %}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Campaign</th>
+      <th scope="col">Adsets</th>
+      <th scope="col">Creative</th>
+      <th scope="col">Launch</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <form method="POST">
+    <tr>
+      <td>
+        <input type="hidden" value="{{camp}}" name='campaign'>
+        {{row.camp}}
+      </td>
 
 
-    </tbody>
-  </table>
+      <td>
+        {% for ad in row.ads %}
+          {{ad.adset}}
+          <br>
+        {% endfor %}
+      </td>
+
+      <td>
+        {% for ad in row.ads %}
+          {{ad.resource}}
+          <br>
+        {% endfor %}
+      </td>
+
+      <td>
+
+          <input type="hidden" value="{{row.path}}" name='path'>
+
+          <button class="btn btn-primary">Launch</button>
+
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+
+
+  </tbody>
+</table>
 
 <!-- 
 <ul class="list-group list-group-flush" id="notes">
