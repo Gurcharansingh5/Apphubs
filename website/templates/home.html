@@ -13,26 +13,55 @@
 {% else %}
 <a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
 {% endif %} 
-{{readyfolderpaths}}
-<ul class="list-group list-group-flush">
-  <form method="POST">
-    {% for camp, adsets in paths.items() %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Campaign</th>
+        <th scope="col">Adsets</th>
+        <th scope="col">Creative</th>
+        <th scope="col">Launch</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for camp, adsets in paths.items() %}  
+        <tr>
+          <td>
+            <input type="hidden" value="{{camp}}" name='campaign'>
+            {{camp}}
+          </td>
 
-    <button type="submit" class="btn btn-primary">Launch</button>
-      {{camp}}:
-        {% for ad, items in adsets.items() %}
-          {{ad}}
-          {% for item in items %}
-            {{ item }}<br>
-          {% endfor %}
-        {% endfor %}
+          {% for adset, creative in adsets.items() %}  
+              {% if adset != 'path' %}
+                <td>
+                    {{adset}}             
+                </td>
 
-      <br>
-      <br>
-    {% endfor %}
-  </form>
+                    <td>
+                      {% for ads in creative %}
+                      ({{ads}})
+                      {% endfor %}
+                    </td>
+              {% endif %}
+            {% endfor %}
+          <td>
+            <form method="POST">
+              {% for path,URL in adsets.items() %}  
 
-</ul>
+              {% if path == 'path' %}
+                <input type="hidden" value="{{URL}}" name='path'>
+              {% endif %}
+              {% endfor %}
+              <button class="btn btn-primary">Launch</button>
+            
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+
+
+    </tbody>
+  </table>
+
 <!-- 
 <ul class="list-group list-group-flush" id="notes">
   {% for note in user.notes %}
