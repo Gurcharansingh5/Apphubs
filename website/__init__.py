@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
 from flask_oauthlib.client import OAuth
-from . import config
+from . import credentials
+from . credentials import DROPBOX_CONSUMER_KEY,DROPBOX_CONSUMER_SECRET
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
@@ -19,7 +20,7 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .models import User, Note
+    from .models import User
 
     create_database(app)
 
@@ -32,10 +33,10 @@ def create_app():
         return User.query.get(str(id))
 
     oauth = OAuth(app)
-    config.dropbox = oauth.remote_app(
+    credentials.dropbox = oauth.remote_app(
     'dropbox',
-    consumer_key='j3x8xr8e9aqg1gb',
-    consumer_secret='kn7mpqs64v0ac8y',
+    consumer_key=DROPBOX_CONSUMER_KEY,
+    consumer_secret=DROPBOX_CONSUMER_SECRET,
     request_token_params={},
     base_url='https://www.dropbox.com/1/',
     request_token_url=None,

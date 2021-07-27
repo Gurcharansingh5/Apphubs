@@ -1,8 +1,8 @@
 # INNER IMPORTS
 from . credentials import FB_AUTHORIZATION_BASE_URL,FB_CLIENT_ID,FB_CLIENT_SECRET,FB_SCOPE,FB_TOKEN_URL,URL
 from  . adVideoCreativee import get_video_creative_id_from_file
-
-from .models import Note,User
+from . import credentials
+from .models import User
 from . import db
 
 # INTERNAL IMPORTS
@@ -19,20 +19,15 @@ from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.api import FacebookAdsApi
 
-
-access_token = 'EAAgEjhopC7UBAHALZAGMXxCFdi9k7vNt8kSikJeYklKHvt5ILzOGuVunItAL2sTkE5Cg8vp2pigUtqlpDOTOGVKZBsUJNaP4h31dxE4fZBnmLN22GFAbIXDYxjg54bU0iFJpqYZCk3oSYZBZBf1pdftIVwZC2y4UBL19YPZAnS7PJSZCy1sJeoNJw'
-app_secret = 'bc5fa70ff4ff8dd693f804ba4f0db80c'
-app_id = 2256808184449973 
 id = 'act_144169154493518'
-FacebookAdsApi.init(access_token=access_token)
-
-
 
 views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
+    print(credentials.FB_USER_ACCESS_TOKEN)
+
     print("request.method "+request.method)
     if request.method == 'POST':
         dropbox_ready_folder = request.form.get('path')
@@ -44,6 +39,7 @@ def home():
         directory_tree = downloadCampaignFolder(dropbox_ready_folder)
         print('directory_tree directory_tree')
         print(directory_tree)
+
         # launch campaign
         launch_campaign(directory_tree)
 
@@ -79,17 +75,6 @@ def home():
 
     return render_template("home.html", user=current_user,paths={})
 
-@views.route('/delete-note', methods=['POST'])
-def delete_note():
-    note = json.loads(request.data)
-    noteId = note['noteId']
-    note = Note.query.get(noteId)
-    if note:
-        if note.user_id == current_user.id:
-            db.session.delete(note)
-            db.session.commit()
-
-    return jsonify({})
 
 @views.route("/fb-login")
 def fblogin():
@@ -120,11 +105,11 @@ def callback():
 def dropboxlogin():
 
     print(url_for('views.dropbox_authorized'))
-    return config.dropbox.authorize(callback=URL+'/login/authorized')
+    return credentials.dropbox.authorize(callback=URL+'/login/authorized')
     
 @views.route('/login/authorized')
 def dropbox_authorized():
-    resp = config.dropbox.authorized_response()
+    resp = credentials.dropbox.authorized_response()
     if resp is None:
         return 'Access denied: reason=%s error=%s' % (
             request.args['error'],
@@ -212,7 +197,7 @@ def path_to_dict(path):
     return d
 
 def launch_campaign(campaign):
-
+    FacebookAdsApi.init(access_token=credentials.FB_USER_ACCESS_TOKEN)
     print('ready directory in launch campaign')
     print(campaign)
 
@@ -221,8 +206,7 @@ def launch_campaign(campaign):
 
     create_campaign_params = {
                 'name': campaign['name'],
-                'objective': 'LINK_CLICKS',
-                
+                'objective': 'LINK_CLICKS',                
                 'status': 'ACTIVE',
                 'special_ad_categories': [],
     }
