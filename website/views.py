@@ -8,6 +8,8 @@ from . import db
 # INTERNAL IMPORTS
 import json
 import os
+import requests
+
 
 # external imports
 from flask import Blueprint, render_template, request, flash, jsonify,redirect,url_for,session
@@ -27,23 +29,25 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
     print(credentials.FB_USER_ACCESS_TOKEN)
-
     print("request.method "+request.method)
+
     if request.method == 'POST':
+        user = User.query.filter_by(email=current_user.email).first()
+        set_access_token_page_and_adaccount(user.fb_access_token)
+    
         dropbox_ready_folder = request.form.get('path')
         campaign_name = request.form.get('campaign')
-        print('path path path path path path')
-        print(dropbox_ready_folder)
+        print('campaign_name campaign_name campaign_name campaign_name campaign_name campaign_name')
+        print(campaign_name)
 
         # download campaign folder(zip) to local, extract it and the directory tree as dict
-        directory_tree = downloadCampaignFolder(dropbox_ready_folder)
+        directory_tree = downloadCampaignFolder(path=dropbox_ready_folder,campaign_name=campaign_name)
         print('directory_tree directory_tree')
         print(directory_tree)
 
         # launch campaign
-        launch_campaign(directory_tree)
+        launch_campaign(campaign=directory_tree,access_token=user.fb_access_token)
 
-        user = User.query.filter_by(email=current_user.email).first()
         dbx = dropbox.Dropbox(user.dropbox_access_token)  
         launch_folder_path = dropbox_ready_folder.replace('READY','LAUNCHED')
         dbx.files_move(from_path=dropbox_ready_folder,to_path=launch_folder_path)
@@ -52,9 +56,12 @@ def home():
 
     user = User.query.filter_by(email=current_user.email).first()
 
+    if user.fb_access_token:
+        set_access_token_page_and_adaccount(user.fb_access_token)
+
+    rows  = []
     if user.dropbox_access_token:
         readyfolderpaths = findReadyFolderPaths()        
-        rows  = []
         for camp, adsets in readyfolderpaths.items():
             path = adsets['path']
             item = {}
@@ -71,9 +78,8 @@ def home():
             rows.append(item)
 
         print(rows)
-        return render_template("home.html", user=current_user,rows=rows)
 
-    return render_template("home.html", user=current_user,paths={})
+    return render_template("home.html", user=current_user,rows=rows)
 
 
 @views.route("/fb-login")
@@ -159,7 +165,7 @@ def findReadyFolderPaths():
     # print(campaign)
     return campaign
 
-def downloadCampaignFolder(path,campaign_name='camp1'):
+def downloadCampaignFolder(path,campaign_name):
     print("downloadCampaignFolder path path")
     print(path)
     user = User.query.filter_by(email=current_user.email).first()
@@ -196,8 +202,9 @@ def path_to_dict(path):
         d['type'] = "file"
     return d
 
-def launch_campaign(campaign):
-    FacebookAdsApi.init(access_token=credentials.FB_USER_ACCESS_TOKEN)
+def launch_campaign(campaign,access_token):
+    from . credentials import AD_ACCOUNT_ID,PAGE_ID
+    FacebookAdsApi.init(access_token=access_token)
     print('ready directory in launch campaign')
     print(campaign)
 
@@ -211,7 +218,7 @@ def launch_campaign(campaign):
                 'special_ad_categories': [],
     }
 
-    campaign_id = AdAccount(id).create_campaign(fields=[],params=create_campaign_params)
+    campaign_id = AdAccount(AD_ACCOUNT_ID).create_campaign(fields=[],params=create_campaign_params)
     print ('campaign_id =============='+campaign_id['id'])
 
     if 'children' in campaign:
@@ -227,7 +234,7 @@ def launch_campaign(campaign):
                 'targeting': {'geo_locations':{'countries':['US']},'facebook_positions':['feed']},
                 'status': 'ACTIVE',
             }
-            ad_set_id = AdAccount(id).create_ad_set(fields=[],params=create_ad_set_params,)
+            ad_set_id = AdAccount(AD_ACCOUNT_ID).create_ad_set(fields=[],params=create_ad_set_params,)
             print ('ad_set_id =============='+ad_set_id['id'])
 
             if 'children' in adsets:
@@ -237,10 +244,10 @@ def launch_campaign(campaign):
                     print(video_ID)
                     create_ad_creative_params = {
                         'name': 'new Sample Creative',
-                        'object_story_spec': {'page_id':100237612354550,'video_data':{'image_url':'https://avatars.githubusercontent.com/u/8880186?s=88&u=ccd6fc36312b4d34e68fff60580f18ddddc58729&v=4','video_id':video_ID,'call_to_action':{'type':'INSTALL_MOBILE_APP','value':{'link':"https://play.google.com/store/apps/details?id=com.ludo.king"}}}},
+                        'object_story_spec': {'page_id':PAGE_ID,'video_data':{'image_url':'https://avatars.githubusercontent.com/u/8880186?s=88&u=ccd6fc36312b4d34e68fff60580f18ddddc58729&v=4','video_id':video_ID,'call_to_action':{'type':'INSTALL_MOBILE_APP','value':{'link':"https://play.google.com/store/apps/details?id=com.ludo.king"}}}},
                     }
 
-                    adCreative = AdAccount(id).create_ad_creative(fields=[],params=create_ad_creative_params,)
+                    adCreative = AdAccount(AD_ACCOUNT_ID).create_ad_creative(fields=[],params=create_ad_creative_params,)
                     print ('adCreative_id =============='+adCreative['id'])
 
                     create_ad_params = {
@@ -249,14 +256,18 @@ def launch_campaign(campaign):
                         'adset_id': ad_set_id['id'],
                         'creative': {'creative_id':adCreative['id']},
                         'status': 'ACTIVE',
-                        'object_story_spec': {'call_to_action':{'type':'LIKE_PAGE','e':{'page':"100237612354550"}}}
+                        'object_story_spec': {'call_to_action':{'type':'LIKE_PAGE','e':{'page':PAGE_ID}}}
                         }
-                    ad_id = AdAccount(id).create_ad(fields=[],params=create_ad_params)
+                    ad_id = AdAccount(AD_ACCOUNT_ID).create_ad(fields=[],params=create_ad_params)
                     print ('ad_id =============='+ad_id['id'])
 
 
 
-
-
+def set_access_token_page_and_adaccount(access_token):
+    credentials.FB_USER_ACCESS_TOKEN = access_token
+    r = requests.get('https://graph.facebook.com/v11.0/me/adaccounts?access_token='+access_token).json()
+    credentials.AD_ACCOUNT_ID= r['data'][0]['id']
+    r = requests.get('https://graph.facebook.com/v11.0/me/accounts?access_token='+access_token).json()
+    credentials.PAGE_ID = r['data'][0]['id']
     
 

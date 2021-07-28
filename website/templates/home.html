@@ -1,82 +1,58 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
-%}
-<!-- <h1 align="center">Notes</h1> -->
+{% extends "base.html" %} {% block title %}Home{% endblock %}
+{% block content%}
 
-{% if user.fb_access_token %}
-<p>FB Logged IN</p>
-{% else %}
-<a class="nav-item nav-link" id="login" href="/fb-login">Connect facebook</a>
-{% endif %}
-<input class="form-control form-control-sm" type="text" placeholder="Page ID">
-{% if user.dropbox_access_token %}
-<p>Dropbox Logged IN</p>
-{% else %}
-<a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
-{% endif %}
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Campaign</th>
-      <th scope="col">Adsets</th>
-      <th scope="col">Creative</th>
-      <th scope="col">Launch</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for row in rows %}
-    <form method="POST">
-    <tr>
-      <td>
-        <input type="hidden" value="{{camp}}" name='campaign'>
-        {{row.camp}}
-      </td>
+  {% if user.fb_access_token %}
+    <p>FB Logged IN</p>
+  {% else %}
+    <a class="nav-item nav-link" id="login" href="/fb-login">Connect facebook</a>
+  {% endif %}
 
+  {% if user.dropbox_access_token %}
+    <p>Dropbox Logged IN</p>
+  {% else %}
+    <a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
+  {% endif %}
 
-      <td>
-        {% for ad in row.ads %}
-          {{ad.adset}}
-          <br>
-        {% endfor %}
-      </td>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Campaign</th>
+        <th scope="col">Adsets</th>
+        <th scope="col">Creative</th>
+        <th scope="col">Launch</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <form method="POST">
+          <tr>
+            <td>
+              <input type="hidden" value="{{row.camp}}" name='campaign'>
+              {{row.camp}}
+            </td>
 
-      <td>
-        {% for ad in row.ads %}
-          {{ad.resource}}
-          <br>
-        {% endfor %}
-      </td>
+            <td>
+              {% for ad in row.ads %}
+                {{ad.adset}}
+                <br>
+              {% endfor %}
+            </td>
 
-      <td>
+            <td>
+              {% for ad in row.ads %}
+                {{ad.resource}}
+                <br>
+              {% endfor %}
+            </td>
 
-          <input type="hidden" value="{{row.path}}" name='path'>
-
-          <button class="btn btn-primary">Launch</button>
-
+            <td>
+                <input type="hidden" value="{{row.path}}" name='path'>
+                <button class="btn btn-primary">Launch</button>
+            </td>
+          </tr>
         </form>
-      </td>
-    </tr>
-    {% endfor %}
 
-
-  </tbody>
-</table>
-
-<!-- 
-<ul class="list-group list-group-flush" id="notes">
-  {% for note in user.notes %}
-  <li class="list-group-item">
-    {{ note.data }}
-    <button type="button" class="close" onClick="deleteNote({{ note.id }})">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </li>
-  {% endfor %}
-</ul>
-<form method="POST">
-  <textarea name="note" id="note" class="form-control"></textarea>
-  <br />
-  <div align="center">
-    <button type="submit" class="btn btn-primary">Add Note</button>
-  </div>
-</form> -->
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}
