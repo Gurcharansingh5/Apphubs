@@ -10,8 +10,9 @@
     <p>Dropbox Logged IN</p>
 
     <select class="form-select" aria-label="Default select example">
+
       {% for folder in root_folders %}
-        <option value="{{folder}}">{{folder}}</option>
+        <option href='/?folder={{folder}}' value="{{folder}}">{{folder}}</option>
       {% endfor %}
     </select>
 
@@ -19,55 +20,69 @@
     <a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
   {% endif %}
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">SKU Name</th>
-        <th scope="col">Campaign</th>
-        <th scope="col">Settings</th>
-        <th scope="col">Adsets</th>
-        <th scope="col">Creative</th>
-        <th scope="col">Launch</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in rows %}
-        <form method="POST">
-          <tr>
-            <td>
-              {{row.SKU}}
-            </td>
-            <td>
-              <input type="hidden" value="{{row.camp}}" name='campaign'>
-              {{row.camp}}
-            </td>
+    {% if rows %}
 
-            <td>
-              {{row.settings}}
-            </td>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">SKU Name</th>
+          <th scope="col">Campaign</th>
+          <th scope="col">Settings</th>
+          <th scope="col">Adsets</th>
+          <th scope="col">Creative</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <form method="POST">
+            <tr>
+              <td>
+                {{row.SKU}}
+              </td>
+              <td>
+                <input type="hidden" value="{{row.camp}}" name='campaign'>
+                {{row.camp}}
+              </td>
+  
+              <td>
+                {{row.settings}}
+              </td>
+  
+              <td>
+                {% for ad in row.ads %}
+                  {{ad.adset}}
+                  <br>
+                {% endfor %}
+              </td>
+  
+              <td>
+                {% for ad in row.ads %}
+                  {{ad.resource}}
+                  <br>
+                {% endfor %}
+              </td>
+  
+              <td>
+                  <input type="hidden" value="{{row.path}}" name='path'>
+                  <button class="btn btn-primary">Launch</button>
+              </td>
+            </tr>
+          </form>
+  
+        {% endfor %}
+      </tbody>
+    </table>
 
-            <td>
-              {% for ad in row.ads %}
-                {{ad.adset}}
-                <br>
-              {% endfor %}
-            </td>
+    <!-- <button class="btn btn-outline-danger">Launch All</button> -->
+    {% else %}
+    <div class="alert alert-danger" role="alert">
+      There are no Campaigns to Launch
+    </div>
+    {% endif %}
 
-            <td>
-              {% for ad in row.ads %}
-                {{ad.resource}}
-                <br>
-              {% endfor %}
-            </td>
 
-            <td>
-                <input type="hidden" value="{{row.path}}" name='path'>
-                <button class="btn btn-primary">Launch</button>
-            </td>
-          </tr>
-        </form>
 
-      {% endfor %}
-    </tbody>
-  </table>
+
+  
 {% endblock %}

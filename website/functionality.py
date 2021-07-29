@@ -15,8 +15,7 @@ import dropbox
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.api import FacebookAdsApi
 
-dropbox_ready_folder=credentials.dropbox_ready_folder_path
-print('after functionality',credentials.dropbox_ready_folder_path)   
+dropbox_ready_folder=os.environ['DROPBOX_READY_FOLDER_PATH']
 
 campaign_name=sys.argv[1]
 
@@ -73,7 +72,9 @@ def get_settings_from_csv(campaign):
     return res
 
 def launch_campaign(campaign,access_token,ad_settings):
-    from credentials import AD_ACCOUNT_ID,PAGE_ID
+    AD_ACCOUNT_ID=os.environ['AD_ACCOUNT_ID']
+    PAGE_ID=os.environ['PAGE_ID']
+    
     FacebookAdsApi.init(access_token=access_token)
 
     create_campaign_params = {
@@ -138,7 +139,7 @@ print(directory_tree)
 ad_settings = get_settings_from_csv(campaign_name)
 
 # launch campaign
-launch_campaign(ad_settings=ad_settings,campaign=directory_tree,access_token=credentials.FB_USER_ACCESS_TOKEN)
+launch_campaign(ad_settings=ad_settings,campaign=directory_tree,access_token=os.environ['FB_USER_ACCESS_TOKEN'])
 
 # Move campaign folder to ready folder
 launch_folder_path = dropbox_ready_folder.replace('READY','LAUNCHED')
