@@ -28,8 +28,6 @@ def launch_campaign_script(command):
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-
-    print(credentials.FB_USER_ACCESS_TOKEN)
     print("request.method "+request.method)
 
     if request.method == 'POST':
@@ -46,26 +44,24 @@ def home():
         print(command)
         t1 = threading.Thread(target=launch_campaign_script, args=(command,))
         t1.start()
-        flash('Campaign will be launched in few seconds', category='success')
-       
+        flash('Campaign will be launched in few seconds', category='success')    
 
+    selected_root_folder = request.args.get('root_folder')
     user = User.query.filter_by(email=current_user.email).first()
-
     if user.fb_access_token:
         set_access_token_page_and_adaccount(user.fb_access_token)
 
     rows  = []
     root_folders = []
     if user.dropbox_access_token:
-
-        credentials.DROPBOX_ACCESS_TOKEN = user.dropbox_access_token
-        dbx = dropbox.Dropbox(user.dropbox_access_token)    
+        os.environ['DROPBOX_ACCESS_TOKEN'] = user.dropbox_access_token
+        dbx = dropbox.Dropbox(user.dropbox_access_token)   
         print("[SUCCESS] dropbox account linked")
         for entry in dbx.files_list_folder("").entries:
             root_folders.append(entry.name)
         print(root_folders)
 
-        readyfolderpaths = findReadyFolderPaths('superlucky')       
+        readyfolderpaths = findReadyFolderPaths(selected_root_folder)       
         print('ready folder path')
         print(readyfolderpaths) 
         if readyfolderpaths :
@@ -147,62 +143,60 @@ def dropbox_authorized():
 
 # function for checking if Ready folder exists
 def findReadyFolderPaths(rootFolder):
-    campaign={}
-    user = User.query.filter_by(email=current_user.email).first()
-    dbx = dropbox.Dropbox(user.dropbox_access_token)    
-    print("[SUCCESS] dropbox account linked")
-    
-    for entry in dbx.files_list_folder('/'+rootFolder).entries:     
-        # entry here is the SKU
-        if isinstance(entry,dropbox.files.FolderMetadata):
-            for subEntry in dbx.files_list_folder('/'+rootFolder+'/'+entry.name).entries:
-                # subentry here is the folders inside SKU folder
-                if subEntry.name == 'READY':
-                    for campaigns in dbx.files_list_folder('/'+rootFolder+'/'+entry.name+'/'+subEntry.name).entries:
-                        # print("entry.name")
-                        # print(entry.name)
+    if rootFolder:
+        dbx = dropbox.Dropbox(os.environ['DROPBOX_ACCESS_TOKEN'])   
+        print("[SUCCESS] dropbox account linked")
+        campaign={}    
+        for entry in dbx.files_list_folder('/'+rootFolder).entries:     
+            # entry here is the SKU
+            if isinstance(entry,dropbox.files.FolderMetadata):
+                for subEntry in dbx.files_list_folder('/'+rootFolder+'/'+entry.name).entries:
+                    # subentry here is the folders inside SKU folder
+                    if subEntry.name == 'READY':
+                        for campaigns in dbx.files_list_folder('/'+rootFolder+'/'+entry.name+'/'+subEntry.name).entries:
+                            # print("entry.name")
+                            # print(entry.name)
 
-                        # print("campaigns.name")
-                        # print(campaigns.name)   
+                            # print("campaigns.name")
+                            # print(campaigns.name)   
 
-                        ready_campaign_path= '/'+rootFolder+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
-                        # print('ready_campaign_path')
-                        # print(ready_campaign_path)
+                            ready_campaign_path= '/'+rootFolder+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
+                            # print('ready_campaign_path')
+                            # print(ready_campaign_path)
 
-                        adset={}
-                        for adsets in dbx.files_list_folder(ready_campaign_path).entries:
-                            # print(adsets.name)  
-                            if not adsets.name.endswith('.csv'):             
-                                adcreative=[]
-                                ready_adset_path = ready_campaign_path+'/'+adsets.name
-                                # print('ready_adset_path')
-                                # print(ready_adset_path)
-                                for adcreatives in dbx.files_list_folder(ready_adset_path).entries:
-                                    # print(adcreatives.name)
-                                    adcreative.append(adcreatives.name)
-                                adset[adsets.name] = adcreative
+                            adset={}
+                            for adsets in dbx.files_list_folder(ready_campaign_path).entries:
+                                # print(adsets.name)  
+                                if not adsets.name.endswith('.csv'):             
+                                    adcreative=[]
+                                    ready_adset_path = ready_campaign_path+'/'+adsets.name
+                                    # print('ready_adset_path')
+                                    # print(ready_adset_path)
+                                    for adcreatives in dbx.files_list_folder(ready_adset_path).entries:
+                                        # print(adcreatives.name)
+                                        adcreative.append(adcreatives.name)
+                                    adset[adsets.name] = adcreative
 
-                            campaign[campaigns.name] = adset
-                            campaign[campaigns.name]['path'] = campaigns.path_display
-                            campaign[campaigns.name]['SKU'] = entry.name
+                                campaign[campaigns.name] = adset
+                                campaign[campaigns.name]['path'] = campaigns.path_display
+                                campaign[campaigns.name]['SKU'] = entry.name
 
 
-    # print('campaign campaign campaign')
-    # print(campaign)
-    return campaign
+        # print('campaign campaign campaign')
+        # print(campaign)
+        return campaign
+    else:
+        return None
 
 def find_root_folder():
-    user = User.query.filter_by(email=current_user.email).first()
-    dbx = dropbox.Dropbox(user.dropbox_access_token)    
+    dbx = dropbox.Dropbox(os.environ['DROPBOX_ACCESS_TOKEN'])   
     print("[SUCCESS] dropbox account linked")
     for entry in dbx.files_list_folder("").entries:
         print("shfdhdfh   "+entry.name)
 
 def get_campaign_settings_from_csv(path):
-    user = User.query.filter_by(email=current_user.email).first()
-    dbx = dropbox.Dropbox(user.dropbox_access_token)    
-    # print("[SUCCESS] dropbox account linked")
-
+    dbx = dropbox.Dropbox(os.environ['DROPBOX_ACCESS_TOKEN'])   
+    print("[SUCCESS] dropbox account linked")
     metadata, f = dbx.files_download(path+'/settings.csv')
     csv_reader = csv.reader(f.content.decode().splitlines(), delimiter=',')
     list_of_rows = []  

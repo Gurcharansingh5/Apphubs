@@ -9,12 +9,16 @@
   {% if user.dropbox_access_token %}
     <p>Dropbox Logged IN</p>
 
-    <select class="form-select" aria-label="Default select example">
+    <form method="GET" action="/">
+      <select class="form-select" aria-label="Default select example" name='root_folder' onchange="this.form.submit()" >
+        <option value="" selected disabled hidden>Choose here</option>
+        {% for folder in root_folders %}
+          <option value="{{folder}}">{{folder}}</option>
+        {% endfor %}
+      </select>
+      <!-- <button type='submit' class="btn btn-outline-warning">CHECK NOW</button> -->
+    </form>
 
-      {% for folder in root_folders %}
-        <option href='/?folder={{folder}}' value="{{folder}}">{{folder}}</option>
-      {% endfor %}
-    </select>
 
   {% else %}
     <a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
