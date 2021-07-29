@@ -7,6 +7,7 @@ from . import db
 
 # INTERNAL IMPORTS
 import os
+import csv
 import requests
 
 # external imports
@@ -27,7 +28,7 @@ def home():
 
     if request.method == 'POST':
         user = User.query.filter_by(email=current_user.email).first()
-        set_access_token_page_and_adaccount(user.fb_access_token)
+        # set_access_token_page_and_adaccount(user.fb_access_token)
 
         dropbox_ready_folder = request.form.get('path')     
         print('before',credentials.dropbox_ready_folder_path)   
@@ -48,20 +49,34 @@ def home():
 
     user = User.query.filter_by(email=current_user.email).first()
 
-    if user.fb_access_token:
-        set_access_token_page_and_adaccount(user.fb_access_token)
+    # if user.fb_access_token:
+    #     set_access_token_page_and_adaccount(user.fb_access_token)
 
     rows  = []
+    root_folders = []
     if user.dropbox_access_token:
-        credentials.DROPBOX_ACCESS_TOKEN = user.dropbox_access_token
 
-        readyfolderpaths = findReadyFolderPaths()        
+        credentials.DROPBOX_ACCESS_TOKEN = user.dropbox_access_token
+        dbx = dropbox.Dropbox(user.dropbox_access_token)    
+        print("[SUCCESS] dropbox account linked")
+        for entry in dbx.files_list_folder("").entries:
+            root_folders.append(entry.name)
+        print(root_folders)
+
+        readyfolderpaths = findReadyFolderPaths('superlucky')       
+        # print('ready folder path')
+        # print(readyfolderpaths) 
+
         for camp, adsets in readyfolderpaths.items():
+
             path = adsets['path']
+            campaign_settings = get_campaign_settings_from_csv(path)
+
+            SKU = adsets['SKU']
             item = {}
             ad_items = []
             for adsets, resource in adsets.items():
-                if adsets != 'path':
+                if adsets != 'path' and adsets != 'SKU':
                     ad_item = {}
                     ad_item['adset'] = adsets
                     ad_item['resource'] = resource
@@ -69,11 +84,13 @@ def home():
             item['camp'] = camp
             item['path'] = path
             item['ads'] = ad_items
+            item['SKU'] = SKU
+            item['settings'] = campaign_settings
             rows.append(item)
 
-        print(rows)
+        # print(rows)
 
-    return render_template("home.html", user=current_user,rows=rows)
+    return render_template("home.html", user=current_user,rows=rows,root_folders=root_folders)
 
 
 @views.route("/fb-login")
@@ -126,39 +143,72 @@ def dropbox_authorized():
 
 
 # function for checking if Ready folder exists
-def findReadyFolderPaths():
+def findReadyFolderPaths(rootFolder):
     campaign={}
-
     user = User.query.filter_by(email=current_user.email).first()
     dbx = dropbox.Dropbox(user.dropbox_access_token)    
     print("[SUCCESS] dropbox account linked")
-    ready_campaign_path = []
-    for entry in dbx.files_list_folder('/superlucky/').entries:
-        for subEntry in dbx.files_list_folder('/superlucky/'+entry.name).entries:
-            if subEntry.name == 'READY':
-                # print(subEntry.name)      
 
-                for campaigns in dbx.files_list_folder('/superlucky/'+entry.name+'/'+subEntry.name).entries:
-                    # print(campaigns.name)                    
-                    ready_campaign_path.append(campaigns.path_display) 
+    for entry in dbx.files_list_folder('/'+rootFolder).entries:
+        
+        for subEntry in dbx.files_list_folder('/'+rootFolder+'/'+entry.name).entries:
+            if subEntry.name == 'READY':
+
+                for campaigns in dbx.files_list_folder('/'+rootFolder+'/'+entry.name+'/'+subEntry.name).entries:
+                    # print("entry.name")
+                    # print(entry.name)
+
+                    # print("campaigns.name")
+                    # print(campaigns.name)   
+
+                    ready_campaign_path= '/'+rootFolder+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
+                    # print('ready_campaign_path')
+                    # print(ready_campaign_path)
 
                     adset={}
-                    for adsets in dbx.files_list_folder('/superlucky/'+entry.name+'/'+subEntry.name+'/'+campaigns.name).entries:
+                    for adsets in dbx.files_list_folder(ready_campaign_path).entries:
                         print(adsets.name)  
                         if not adsets.name.endswith('.csv'):             
                             adcreative=[]
-                            for adcreatives in dbx.files_list_folder('/superlucky/'+entry.name+'/'+subEntry.name+'/'+campaigns.name+'/'+adsets.name).entries:
+                            ready_adset_path = ready_campaign_path+'/'+adsets.name
+                            print('ready_adset_path')
+                            print(ready_adset_path)
+                            for adcreatives in dbx.files_list_folder(ready_adset_path).entries:
                                 # print(adcreatives.name)
                                 adcreative.append(adcreatives.name)
 
                             adset[adsets.name] = adcreative
                         campaign[campaigns.name] = adset
                         campaign[campaigns.name]['path'] = campaigns.path_display
+                        campaign[campaigns.name]['SKU'] = entry.name
 
 
-    # print(ready_campaign_path)
+    # print('campaign campaign campaign')
     # print(campaign)
     return campaign
+
+def find_root_folder():
+    user = User.query.filter_by(email=current_user.email).first()
+    dbx = dropbox.Dropbox(user.dropbox_access_token)    
+    print("[SUCCESS] dropbox account linked")
+    for entry in dbx.files_list_folder("").entries:
+        print("shfdhdfh   "+entry.name)
+
+def get_campaign_settings_from_csv(path):
+    user = User.query.filter_by(email=current_user.email).first()
+    dbx = dropbox.Dropbox(user.dropbox_access_token)    
+    print("[SUCCESS] dropbox account linked")
+
+    metadata, f = dbx.files_download(path+'/settings.csv')
+    csv_reader = csv.reader(f.content.decode().splitlines(), delimiter=',')
+    list_of_rows = []  
+    for row in csv_reader:
+        list_of_rows.append(row)
+    res = {list_of_rows[0][i]: list_of_rows[1][i] for i in range(len(list_of_rows[0]))}
+    print("get_campaign_settings_from_csv : ", res)
+    return res
+
+    
 
 def set_access_token_page_and_adaccount(access_token):
     credentials.FB_USER_ACCESS_TOKEN = access_token
