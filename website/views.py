@@ -87,9 +87,8 @@ def home():
                 rows.append(item)
 
             # print(rows)
-            return render_template("home.html", user=current_user,rows=rows,root_folders=root_folders)
-        else:
-            return render_template("home.html", user=current_user,rows=[],root_folders=root_folders) 
+
+    return render_template("home.html", user=current_user,rows=rows,root_folders=root_folders) 
 
 
 @views.route("/fb-login")
