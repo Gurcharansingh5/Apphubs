@@ -7,8 +7,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
-    fb_access_token = db.Column(db.String(150))
+    fb_access_token = db.Column(db.String(200))
     dropbox_access_token = db.Column(db.String(150))
     
     auto_launch = db.Column(db.Boolean,default=True)
-    last_runned = db.Column(db.DateTime,default=datetime.now())
+    last_runned = db.Column(db.DateTime)
+    time_delta = db.Column(db.Integer,default=0)

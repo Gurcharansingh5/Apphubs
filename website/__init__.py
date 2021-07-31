@@ -5,14 +5,18 @@ from flask_login import LoginManager
 from flask_oauthlib.client import OAuth
 from . import credentials
 from . credentials import DROPBOX_CONSUMER_KEY,DROPBOX_CONSUMER_SECRET
+# from flask_crontab import Crontab
+
 db = SQLAlchemy()
 DB_NAME = "database.db"
+# crontab = Crontab()
 
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
+    # crontab.init_app(app)
 
     from .views import views
     from .auth import auth
@@ -55,4 +59,7 @@ def create_database(app):
 
 
     
+# @crontab.job(minute="1")
+# def my_scheduled_job():    
+#     print('sihdsaoihfsaiohfsa')
  

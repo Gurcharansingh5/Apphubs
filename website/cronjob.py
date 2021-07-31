@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,timedelta
 import credentials
 import sqlite3
 
@@ -12,47 +12,62 @@ from facebook_business import FacebookSession
 from facebook_business import FacebookAdsApi
 from facebook_business.adobjects.advideo import AdVideo
 
-def getUsersFromDBfile():
-    try:
-        conn = sqlite3.connect("databasecopy.db")    
-    except :
-        print('e')
+class Interact_with_DB:
 
-    cursor = conn.cursor()
-    cursor.execute("SELECT fb_access_token,dropbox_access_token,auto_launch,last_runned FROM user;")
-    users=[]
-    for row in cursor.fetchall():
-        user={}
-        user['fb_access_token']=row[0]
-        user['dropbox_access_token']=row[1]
-        user['auto_launch']=row[2]
-        user['last_runned']=row[3]
-        users.append(user)
-        # print(user)
+    def __init__(self):
+        try:
+            self.conn = sqlite3.connect("database.db")    
+        except :
+            print('e')
 
-    print(users)
-    conn.close()
-    return users
+    def getUsersFromDBfile(self):        
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT fb_access_token,dropbox_access_token,auto_launch,last_runned,time_delta FROM user;") 
+        queryset= cursor.fetchall() 
+        users=[]
+        for row in queryset:
+            print('enteres')
+            user={}
+            user['fb_access_token']=row[0]
+            user['dropbox_access_token']=row[1]
+            user['auto_launch']=row[2]
+            user['last_runned']= None
+
+            if row[3] :
+                user['last_runned']= datetime.fromisoformat(row[3])
+            
+            user['time_delta'] = row[4]
+            print(user)
+            users.append(user)
+        print(users)
+        return users
+    
+    def updateLastRunned(self,last_runned,dropbox_access_token):        
+        cursor = self.conn.cursor()
+        query = f"UPDATE user SET last_runned='{last_runned}' WHERE dropbox_access_token='{dropbox_access_token}'"
+        print(query)
+        cursor.execute(query)   
+        self.conn.commit()   
 
 def findReadyFolderPaths(rootFolder,usertoken):
     if rootFolder:
         dbx = dropbox.Dropbox(usertoken)   
         print("[SUCCESS] dropbox account linked")
         campaign={}    
-        for entry in dbx.files_list_folder('/'+rootFolder).entries:     
+        for entry in dbx.files_list_folder('/'+rootFolder.name).entries:     
             # entry here is the SKU
             if isinstance(entry,dropbox.files.FolderMetadata):
-                for subEntry in dbx.files_list_folder('/'+rootFolder+'/'+entry.name).entries:
+                for subEntry in dbx.files_list_folder('/'+rootFolder.name+'/'+entry.name).entries:
                     # subentry here is the folders inside SKU folder
                     if subEntry.name == 'READY':
-                        for campaigns in dbx.files_list_folder('/'+rootFolder+'/'+entry.name+'/'+subEntry.name).entries:
+                        for campaigns in dbx.files_list_folder('/'+rootFolder.name+'/'+entry.name+'/'+subEntry.name).entries:
                             # print("entry.name")
                             # print(entry.name)
 
                             # print("campaigns.name")
                             # print(campaigns.name)   
 
-                            ready_campaign_path= '/'+rootFolder+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
+                            ready_campaign_path= '/'+rootFolder.name+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
                             # print('ready_campaign_path')
                             # print(ready_campaign_path)
 
@@ -132,8 +147,8 @@ def get_settings_from_csv(campaign):
     return res
 
 def set_access_token_page_and_adaccount(access_token):
-    os.environ['FB_USER_ACCESS_TOKEN'] = access_token
-
+    print('set_access_token_page_and_adaccount')
+    print(access_token)
     r = requests.get('https://graph.facebook.com/v11.0/me/adaccounts?access_token='+access_token).json()
     os.environ['AD_ACCOUNT_ID']= r['data'][0]['id']
 
@@ -253,47 +268,51 @@ def get_video_creative_id_from_file(path,accessToken):
     print(video)
     return video['id']
 
-users = getUsersFromDBfile()
-auto = True
+db_obj = Interact_with_DB()
+users= db_obj.getUsersFromDBfile()
+print('execution starts')
+print(users)
 for user in users:
     if user['auto_launch'] > 0:
         print('auto launch activated')
-
         if user['fb_access_token'] and user['dropbox_access_token']:
             print('fb and db token found')
-            set_access_token_page_and_adaccount(user['fb_access_token'])
+
+            set_access_token_page_and_adaccount(access_token = user['fb_access_token'])
             dbx=dropbox.Dropbox(user['dropbox_access_token'])
             print('dbx connected')
 
-            # if user.last_runned - datetime.now() > user.time:
-            if True:                    
-                # get path of ready folder
-                readyfolderpaths = findReadyFolderPaths('superlucky',user['dropbox_access_token'])
-                print('readyfolder paths')
-                print(readyfolderpaths)
+            if user['last_runned'] == None or datetime.now() - user['last_runned'] >= timedelta(minutes=user['time_delta']):
+                for root_folder in dbx.files_list_folder("").entries:
+                    readyfolderpaths = findReadyFolderPaths(rootFolder=root_folder,usertoken=user['dropbox_access_token'])
+                    print('readyfolder paths')
+                    print(readyfolderpaths)
 
-                if readyfolderpaths:       
-                    for camp, adsets in readyfolderpaths.items():
-                        print('for camp, adsets in readyfolderpaths.items()')
-                        print(camp,adsets['path'])
-                        campaign_name = camp
-                        path = adsets['path']
+                    if readyfolderpaths:       
+                        for camp, adsets in readyfolderpaths.items():
+                            print('for camp, adsets in readyfolderpaths.items()')
+                            print(camp,adsets['path'])
+                            campaign_name = camp
+                            path = adsets['path']
+                            
+                            ready_folder_directory_tree = downloadCampaignFolder(path=path,campaign_name=campaign_name,accessToken=user['dropbox_access_token']) 
+                            print('ready_folder_directory_tree')
+                            print(readyfolderpaths)
+
+                            # Read settings from settings.csv
+                            ad_settings = get_settings_from_csv(campaign_name)
+
+                            launch_campaign(ad_settings=ad_settings,campaign=ready_folder_directory_tree,access_token=user['fb_access_token'])
+
+                            db_obj.updateLastRunned(last_runned=datetime.now(),dropbox_access_token=user['dropbox_access_token'])
+                            # Move campaign folder to ready folder
+                            launch_folder_path = path.replace('READY','LAUNCHED')
+                            dbx.files_move(from_path=path,to_path=launch_folder_path)
+
+                            #delete downloaded folder from local
+                            folder_path = os.getcwd().replace('\\','/')
+                            shutil.rmtree(folder_path+'/'+campaign_name,"Authors")
                         
-                        ready_folder_directory_tree = downloadCampaignFolder(path=path,campaign_name=campaign_name,accessToken=user['dropbox_access_token']) 
-                        print('ready_folder_directory_tree')
-                        print(readyfolderpaths)
-
-                        # Read settings from settings.csv
-                        ad_settings = get_settings_from_csv(campaign_name)
-
-                        launch_campaign(ad_settings=ad_settings,campaign=ready_folder_directory_tree,access_token=user['fb_access_token'])
-
-                        # Move campaign folder to ready folder
-                        launch_folder_path = path.replace('READY','LAUNCHED')
-                        dbx.files_move(from_path=path,to_path=launch_folder_path)
-
-                        #delete downloaded folder from local
-                        folder_path = os.getcwd().replace('\\','/')
-                        shutil.rmtree(folder_path+'/'+campaign_name,"Authors")
-
-                        # user.last_runned = datetime.now()
+                            # user.last_runned = datetime.now()
+                    else:
+                        print('no campaigns to launch in '+root_folder.name )
