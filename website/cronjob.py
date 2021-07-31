@@ -1,15 +1,38 @@
 from datetime import datetime
 import credentials
+import sqlite3
+
 import os,shutil,csv,requests
 import dropbox,json
 from zipfile import ZipFile
-from models import User
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.advideo import AdVideo
 from facebook_business import FacebookSession
 from facebook_business import FacebookAdsApi
 from facebook_business.adobjects.advideo import AdVideo
+
+def getUsersFromDBfile():
+    try:
+        conn = sqlite3.connect("databasecopy.db")    
+    except :
+        print('e')
+
+    cursor = conn.cursor()
+    cursor.execute("SELECT fb_access_token,dropbox_access_token,auto_launch,last_runned FROM user;")
+    users=[]
+    for row in cursor.fetchall():
+        user={}
+        user['fb_access_token']=row[0]
+        user['dropbox_access_token']=row[1]
+        user['auto_launch']=row[2]
+        user['last_runned']=row[3]
+        users.append(user)
+        # print(user)
+
+    print(users)
+    conn.close()
+    return users
 
 def findReadyFolderPaths(rootFolder,usertoken):
     if rootFolder:
@@ -181,7 +204,7 @@ def launch_campaign(campaign,access_token,ad_settings):
                 if 'children' in adsets:
                     for ads in adsets['children']:
                         print(campaign['name']+'/'+adsets['name']+'/'+ads['name']+ "    jfsidjfidgfagi")
-                        video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'],accessToken=user.fb_access_token)
+                        video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'],accessToken=user['fb_access_token'])
                         print(video_ID)
                         create_ad_creative_params = {
                             'name': 'new Sample Creative',
@@ -230,18 +253,22 @@ def get_video_creative_id_from_file(path,accessToken):
     print(video)
     return video['id']
 
-users = User.objects.all()
+users = getUsersFromDBfile()
 auto = True
 for user in users:
-    if user.fb_access_token and user.dropbox_access_token:
-        print('fb and db token found')
-        set_access_token_page_and_adaccount(user.fb_access_token)
-        dbx=dropbox.Dropbox(user.dropbox_access_token)
-        print('dbx connected')
-        if auto:            
+    if user['auto_launch'] > 0:
+        print('auto launch activated')
+
+        if user['fb_access_token'] and user['dropbox_access_token']:
+            print('fb and db token found')
+            set_access_token_page_and_adaccount(user['fb_access_token'])
+            dbx=dropbox.Dropbox(user['dropbox_access_token'])
+            print('dbx connected')
+
             # if user.last_runned - datetime.now() > user.time:
+            if True:                    
                 # get path of ready folder
-                readyfolderpaths = findReadyFolderPaths('superlucky',user.dropbox_access_token)
+                readyfolderpaths = findReadyFolderPaths('superlucky',user['dropbox_access_token'])
                 print('readyfolder paths')
                 print(readyfolderpaths)
 
@@ -252,14 +279,14 @@ for user in users:
                         campaign_name = camp
                         path = adsets['path']
                         
-                        ready_folder_directory_tree = downloadCampaignFolder(path=path,campaign_name=campaign_name,accessToken=user.dropbox_access_token) 
+                        ready_folder_directory_tree = downloadCampaignFolder(path=path,campaign_name=campaign_name,accessToken=user['dropbox_access_token']) 
                         print('ready_folder_directory_tree')
                         print(readyfolderpaths)
 
                         # Read settings from settings.csv
                         ad_settings = get_settings_from_csv(campaign_name)
 
-                        launch_campaign(ad_settings=ad_settings,campaign=ready_folder_directory_tree,access_token=user.fb_access_token)
+                        launch_campaign(ad_settings=ad_settings,campaign=ready_folder_directory_tree,access_token=user['fb_access_token'])
 
                         # Move campaign folder to ready folder
                         launch_folder_path = path.replace('READY','LAUNCHED')

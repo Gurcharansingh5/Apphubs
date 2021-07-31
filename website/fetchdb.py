@@ -8,7 +8,6 @@ except :
 
 cursor = conn.cursor()
 cursor.execute("SELECT fb_access_token,dropbox_access_token,auto_launch,last_runned FROM user;")
-# print(f"user Name : {cursor.fetchall()}")
 users=[]
 for row in cursor.fetchall():
     user={}
