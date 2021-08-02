@@ -1,5 +1,4 @@
 # INNER IMPORTS
-import re
 from website.credentials import FB_AUTHORIZATION_BASE_URL,FB_CLIENT_ID,FB_CLIENT_SECRET,FB_SCOPE,FB_TOKEN_URL,URL
 from . import credentials
 from .models import User
@@ -7,6 +6,7 @@ from . import db
 
 # INTERNAL IMPORTS
 import os
+import time
 import csv
 import requests
 import threading
@@ -24,70 +24,38 @@ views = Blueprint('views', __name__)
 def launch_campaign_script(command):
     os.system(command) 
 
-
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
     print("request.method "+request.method)
-
-    if request.method == 'POST':
-        user = User.query.filter_by(email=current_user.email).first()
-
-        dropbox_ready_folder = request.form.get('path')     
-        campaign_name = request.form.get('campaign')
-
-        os.environ['DROPBOX_READY_FOLDER_PATH']=dropbox_ready_folder
-
-        folder_path = os.getcwd().replace('\\','/')
-        file_path = folder_path+'/website/functionality.py'
-        command = 'python3 '+file_path+' '+campaign_name
-        print(command)
-        t1 = threading.Thread(target=launch_campaign_script, args=(command,))
-        t1.start()
-        flash('Campaign will be launched in few seconds', category='success')    
-
-    auto_launch_flag = request.args.get('auto_flag')
-    print('auto_launch_flag')
-    print(auto_launch_flag)
-    
-    if auto_launch_flag == '1':
-        auto_launch_flag= True
-    else:
-        auto_launch_flag= False
-    print(type(auto_launch_flag))
-    
-    time_delta = request.args.get('time_delta')
-    print('time_delta')
-    print(time_delta)
-
     user = User.query.filter_by(email=current_user.email).first()
-    print(user.auto_launch,' ',user.time_delta)
-    user.auto_launch = auto_launch_flag
-    user.time_delta = time_delta
-    db.session.commit()
+    if user.fb_access_token:       
+        if fb_token_valid:
+            print('fb_token_valid')
+        else:
+            user.fb_access_token = None
+            db.session.commit()
 
-    if user.fb_access_token:
-        set_access_token_page_and_adaccount(user.fb_access_token)
 
     rows  = []
     root_folders = []
     selected_root_folder = request.args.get('root_folder')
     if user.dropbox_access_token:
-        os.environ['DROPBOX_ACCESS_TOKEN'] = user.dropbox_access_token
         dbx = dropbox.Dropbox(user.dropbox_access_token)   
         print("[SUCCESS] dropbox account linked")
+
         for entry in dbx.files_list_folder("").entries:
             root_folders.append(entry.name)
         print(root_folders)
 
-        readyfolderpaths = findReadyFolderPaths(selected_root_folder)       
+        readyfolderpaths = findReadyFolderPaths(rootFolder=selected_root_folder,access_token=user.dropbox_access_token)       
         print('ready folder path')
         print(readyfolderpaths) 
         if readyfolderpaths :
             for camp, adsets in readyfolderpaths.items():
 
                 path = adsets['path']
-                campaign_settings = get_campaign_settings_from_csv(path)
+                campaign_settings = get_campaign_settings_from_csv(path=path,access_token= user.dropbox_access_token)
 
                 SKU = adsets['SKU']
                 item = {}
@@ -108,6 +76,49 @@ def home():
             # print(rows)
 
     return render_template("home.html", user=current_user,rows=rows,root_folders=root_folders) 
+
+
+@views.route('/update_auto_launch', methods=['GET', 'POST'])
+@login_required
+def update_auto_launch():
+    if request.method == 'POST':
+        auto_launch_flag = request.form.get('auto_flag')
+
+        if auto_launch_flag == '1':
+            auto_launch_flag= True
+        else:
+            auto_launch_flag= False
+
+        time_delta = request.form.get('time_delta')
+
+        user = User.query.filter_by(email=current_user.email).first()
+        user.auto_launch = auto_launch_flag
+        user.time_delta = int(time_delta)
+        db.session.commit()
+
+        return redirect(url_for('views.home'))
+
+
+@views.route('/launch_campaign', methods=['GET', 'POST'])
+@login_required
+def launch_campaign():
+    print("request.method launch_campaign"+request.method)
+    if request.method == 'POST':
+        user = User.query.filter_by(email=current_user.email).first()
+
+        dropbox_ready_folder = request.form.get('path')     
+        campaign_name = request.form.get('campaign')
+
+        folder_path = os.getcwd().replace('\\','/')
+        file_path = folder_path+'/website/functionality.py'
+        command = f'python {file_path} {campaign_name} {user.dropbox_access_token} {dropbox_ready_folder} {user.fb_access_token}'
+        print(command)
+        t1 = threading.Thread(target=launch_campaign_script, args=(command,))
+        t1.start()
+        flash('Campaign will be launched in few seconds', category='success') 
+        time.sleep(5)
+        return redirect(url_for('views.home'))
+
 
 
 @views.route("/fb-login")
@@ -160,9 +171,9 @@ def dropbox_authorized():
 
 
 # function for checking if Ready folder exists
-def findReadyFolderPaths(rootFolder):
+def findReadyFolderPaths(rootFolder,access_token):
     if rootFolder:
-        dbx = dropbox.Dropbox(os.environ['DROPBOX_ACCESS_TOKEN'])   
+        dbx = dropbox.Dropbox(access_token)   
         print("[SUCCESS] dropbox account linked")
         campaign={}    
         for entry in dbx.files_list_folder('/'+rootFolder).entries:     
@@ -206,14 +217,8 @@ def findReadyFolderPaths(rootFolder):
     else:
         return None
 
-def find_root_folder():
-    dbx = dropbox.Dropbox(os.environ['DROPBOX_ACCESS_TOKEN'])   
-    print("[SUCCESS] dropbox account linked")
-    for entry in dbx.files_list_folder("").entries:
-        print("shfdhdfh   "+entry.name)
-
-def get_campaign_settings_from_csv(path):
-    dbx = dropbox.Dropbox(os.environ['DROPBOX_ACCESS_TOKEN'])   
+def get_campaign_settings_from_csv(path,access_token):
+    dbx = dropbox.Dropbox(access_token)   
     print("[SUCCESS] dropbox account linked")
     metadata, f = dbx.files_download(path+'/settings.csv')
     csv_reader = csv.reader(f.content.decode().splitlines(), delimiter=',')
@@ -221,19 +226,28 @@ def get_campaign_settings_from_csv(path):
     for row in csv_reader:
         list_of_rows.append(row)
     res = {list_of_rows[0][i]: list_of_rows[1][i] for i in range(len(list_of_rows[0]))}
-    # print("get_campaign_settings_from_csv : ", res)
     return res
 
     
 
 def set_access_token_page_and_adaccount(access_token):
-    os.environ['FB_USER_ACCESS_TOKEN'] = access_token
-
     r = requests.get('https://graph.facebook.com/v11.0/me/adaccounts?access_token='+access_token).json()
-    os.environ['AD_ACCOUNT_ID']= r['data'][0]['id']
-
+    AD_ACCOUNT_ID= r['data'][0]['id']
     r = requests.get('https://graph.facebook.com/v11.0/me/accounts?access_token='+access_token).json()
-    os.environ['PAGE_ID'] = r['data'][0]['id']
+    PAGE_ID= r['data'][0]['id']
+    return AD_ACCOUNT_ID,PAGE_ID
 
     
 
+def fb_token_valid(access_token):
+    r = requests.get('https://graph.facebook.com/v11.0/me/access_token='+access_token).json()
+    print(r)
+    if 'error' in r:
+        return False
+    else:
+        return True
+
+
+
+
+    

@@ -1,6 +1,5 @@
 # INNER IMPORTS
 from adVideoCreativee import get_video_creative_id_from_file
-import credentials
 
 # INTERNAL IMPORTS
 import json
@@ -8,6 +7,7 @@ import os
 import csv
 import shutil
 import sys
+import requests
 
 # external imports
 from zipfile import ZipFile
@@ -15,9 +15,11 @@ import dropbox
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.api import FacebookAdsApi
 
-dropbox_ready_folder=os.environ['DROPBOX_READY_FOLDER_PATH']
 
 campaign_name=sys.argv[1]
+DROPBOX_ACCESS_TOKEN = sys.argv[2]
+dropbox_ready_folder = sys.argv[3]
+FB_USER_ACCESS_TOKEN = sys.argv[4]
 
 def path_to_dict(path):
     d = {'name': os.path.basename(path)}
@@ -29,8 +31,7 @@ def path_to_dict(path):
         d['type'] = "file"
     return d
 
-print('FUNCTIONALITY',credentials.DROPBOX_ACCESS_TOKEN)
-dbx = dropbox.Dropbox(credentials.DROPBOX_ACCESS_TOKEN)  
+dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)  
 
 def downloadCampaignFolder(path,campaign_name):
     print("downloadCampaignFolder path path")
@@ -71,9 +72,20 @@ def get_settings_from_csv(campaign):
     print("list_of_rows : ", res)
     return res
 
+def set_access_token_page_and_adaccount(access_token):
+
+    r = requests.get('https://graph.facebook.com/v11.0/me/adaccounts?access_token='+access_token).json()
+    print(r)
+    AD_ACCOUNT_ID= r['data'][0]['id']
+
+    r = requests.get('https://graph.facebook.com/v11.0/me/accounts?access_token='+access_token).json()
+    print(r)
+    PAGE_ID= r['data'][0]['id']
+
+    return AD_ACCOUNT_ID,PAGE_ID
+
 def launch_campaign(campaign,access_token,ad_settings):
-    AD_ACCOUNT_ID=os.environ['AD_ACCOUNT_ID']
-    PAGE_ID=os.environ['PAGE_ID']
+    AD_ACCOUNT_ID,PAGE_ID = set_access_token_page_and_adaccount(access_token)       
     
     FacebookAdsApi.init(access_token=access_token)
 
@@ -108,7 +120,7 @@ def launch_campaign(campaign,access_token,ad_settings):
                 if 'children' in adsets:
                     for ads in adsets['children']:
                         print(campaign['name']+'/'+adsets['name']+'/'+ads['name']+ "    jfsidjfidgfagi")
-                        video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'])
+                        video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'],access_token=access_token,ad_account_id=AD_ACCOUNT_ID)
                         print(video_ID)
                         create_ad_creative_params = {
                             'name': 'new Sample Creative',
@@ -139,7 +151,7 @@ print(directory_tree)
 ad_settings = get_settings_from_csv(campaign_name)
 
 # launch campaign
-launch_campaign(ad_settings=ad_settings,campaign=directory_tree,access_token=os.environ['FB_USER_ACCESS_TOKEN'])
+launch_campaign(ad_settings=ad_settings,campaign=directory_tree,access_token=FB_USER_ACCESS_TOKEN)
 
 # Move campaign folder to ready folder
 launch_folder_path = dropbox_ready_folder.replace('READY','LAUNCHED')

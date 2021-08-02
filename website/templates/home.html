@@ -20,14 +20,12 @@
     }
 }
     </script> -->
-    <form method="GET" action="/">
+    <form method="POST" action="/update_auto_launch">
         <input type="checkbox" class="form-check-input" value=1 name="auto_flag" id="auto_flag" {% if user.auto_launch %} checked {% endif %}>
         <label class="form-check-label" for="exampleCheck1">AUTO</label>
         <input type="text" class="form-control" id="time_delta" value={{user.time_delta}} name="time_delta">
         <button type="submit" class="btn btn-outline-warning">UPDATE</button>
-
     </form>
-    {{user.auto_launch}}
 
     <form method="GET" action="/">
       <select class="form-select" aria-label="Default select example" name='root_folder' onchange="this.form.submit()" >
@@ -59,7 +57,7 @@
       </thead>
       <tbody>
         {% for row in rows %}
-          <form method="POST">
+          <form method="POST" action="/launch_campaign">
             <tr>
               <td>
                 {{row.SKU}}

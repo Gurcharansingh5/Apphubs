@@ -11,7 +11,7 @@ FB_CLIENT_SECRET="bc5fa70ff4ff8dd693f804ba4f0db80c"
 FB_AUTHORIZATION_BASE_URL = "https://www.facebook.com/dialog/oauth"
 FB_TOKEN_URL = "https://graph.facebook.com/oauth/access_token"
 FB_SCOPE = ["email","ads_management"]
-URL = "https://4526073e88b7.ngrok.io"
+URL = "https://88a19af99acb.ngrok.io"
 
 
 

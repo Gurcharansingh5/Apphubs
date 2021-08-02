@@ -1,5 +1,6 @@
 from datetime import datetime,timedelta
-from . import credentials
+# from . import credentials ubuntu
+import credentials
 import sqlite3
 import pathlib
 import logging
@@ -338,3 +339,4 @@ def main_cron():
                                 # user.last_runned = datetime.now()
                         else:
                             print('no campaigns to launch in '+root_folder.name )
+main_cron()
