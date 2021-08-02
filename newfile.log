@@ -1,0 +1,18 @@
+2021-08-02 12:56:02,506 execution starts
+2021-08-02 12:56:02,506 auto launch activated
+2021-08-02 12:56:02,506 fb and db token found
+2021-08-02 12:56:02,509 Starting new HTTPS connection (1): graph.facebook.com:443
+2021-08-02 12:56:02,844 https://graph.facebook.com:443 "GET /v11.0/me/adaccounts?access_token=EAAgEjhopC7UBAKQ34lkqgOqLnlqIDu3G0qEgdAd3Nzvb4lOJo03DtVIVo5lskd3zsQYsw4lRpoZCkXyHARSw6x5cNNGE87NGt5j1f5ZApjUXNp9BXgMUNPjGDV1yPJ5ZC6nv7FjtO3jnkeLz2LZAJScd6hyBZAjERbwfzngENdbi3EpoMn8auZBuqNApelhicZD HTTP/1.1" 200 164
+2021-08-02 12:56:02,852 Starting new HTTPS connection (1): graph.facebook.com:443
+2021-08-02 12:56:03,204 https://graph.facebook.com:443 "GET /v11.0/me/accounts?access_token=EAAgEjhopC7UBAKQ34lkqgOqLnlqIDu3G0qEgdAd3Nzvb4lOJo03DtVIVo5lskd3zsQYsw4lRpoZCkXyHARSw6x5cNNGE87NGt5j1f5ZApjUXNp9BXgMUNPjGDV1yPJ5ZC6nv7FjtO3jnkeLz2LZAJScd6hyBZAjERbwfzngENdbi3EpoMn8auZBuqNApelhicZD HTTP/1.1" 200 408
+2021-08-02 12:56:03,209 dbx connected
+2021-08-02 12:56:03,210 Request to files/list_folder
+2021-08-02 12:56:03,214 Starting new HTTPS connection (1): api.dropboxapi.com:443
+2021-08-02 12:56:04,084 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-02 12:56:04,087 Request to files/list_folder
+2021-08-02 12:56:04,091 Starting new HTTPS connection (1): api.dropboxapi.com:443
+2021-08-02 12:56:04,740 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-02 12:56:04,742 Request to files/list_folder
+2021-08-02 12:56:05,158 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-02 12:56:05,160 Request to files/list_folder
+2021-08-02 12:56:05,538 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None

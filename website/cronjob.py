@@ -1,7 +1,8 @@
 from datetime import datetime,timedelta
-import credentials
+from . import credentials
 import sqlite3
-
+import pathlib
+import logging
 import os,shutil,csv,requests
 import dropbox,json
 from zipfile import ZipFile
@@ -12,13 +13,23 @@ from facebook_business import FacebookSession
 from facebook_business import FacebookAdsApi
 from facebook_business.adobjects.advideo import AdVideo
 
+#Create and configure logger
+logging.basicConfig(filename="newfile.log",
+                    format='%(asctime)s %(message)s',
+                    filemode='w')
+logger=logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
 class Interact_with_DB:
 
     def __init__(self):
         try:
-            self.conn = sqlite3.connect("database.db")    
-        except :
-            print('e')
+            db_path = str(pathlib.Path(__file__).parent.resolve())+'/database.db'
+            self.conn = sqlite3.connect(db_path)    
+        except Exception as ex:
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(ex).__name__, ex.args)
+            print(message)
 
     def getUsersFromDBfile(self):        
         cursor = self.conn.cursor()
@@ -111,17 +122,18 @@ def downloadCampaignFolder(path,campaign_name,accessToken):
     print("downloadCampaignFolder path path")
     print(path)
 
-    folder_path = os.getcwd().replace('\\','/')
+    folder_path = str(pathlib.Path(__file__).parent.resolve()).replace('\\','/')
     file_name = "READY.zip"
-    print(folder_path+'/'+file_name)
+    download_path=folder_path+'/'+file_name
+    print(download_path)
 
     # download folder as zip
-    dbx.files_download_zip_to_file(path=path,download_path=folder_path+'/'+file_name)
+    dbx.files_download_zip_to_file(path=path,download_path=download_path)
 
     # extract the downloaded zip
-    with ZipFile(file_name, 'r') as zip:
+    with ZipFile(download_path, 'r') as zip:
         print('Extracting all the files now...')
-        zip.extractall()
+        zip.extractall(folder_path)
         print('Done!')
     os.remove(folder_path+'/'+file_name)
     #convert directory structure to dict
@@ -133,7 +145,7 @@ def downloadCampaignFolder(path,campaign_name,accessToken):
     return ready_directory
 
 def get_settings_from_csv(campaign):
-    folder_path = os.getcwd().replace('\\','/')
+    folder_path = str(pathlib.Path(__file__).parent.resolve()).replace('\\','/')
     folder_path = folder_path+'/'+campaign
 
     with open(folder_path+'/settings.csv') as csv_file:
@@ -169,7 +181,7 @@ def get_video_creative_id_from_file(path,accessToken,ad_account_id):
     path = path.replace('"\"','/')
     print(path)
 
-    folder_path = os.getcwd().replace('\\','/')
+    folder_path = str(pathlib.Path(__file__).parent.resolve()).replace('\\','/')
     video_path = folder_path+'/'+path
     print('videopath')
     print(video_path)
@@ -221,7 +233,7 @@ def launch_campaign(campaign,access_token,ad_settings,ad_account_id,page_id):
                 if 'children' in adsets:
                     for ads in adsets['children']:
                         print(campaign['name']+'/'+adsets['name']+'/'+ads['name']+ "    jfsidjfidgfagi")
-                        video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'],accessToken=user['fb_access_token'],ad_account_id=ad_account_id)
+                        video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'],accessToken=access_token,ad_account_id=ad_account_id)
                         print(video_ID)
                         create_ad_creative_params = {
                             'name': 'new Sample Creative',
@@ -255,7 +267,7 @@ def get_video_creative_id_from_file(path,accessToken,ad_account_id):
     path = path.replace('"\"','/')
     print(path)
 
-    folder_path = os.getcwd().replace('\\','/')
+    folder_path = str(pathlib.Path(__file__).parent.resolve()).replace('\\','/')
     video_path = folder_path+'/'+path
     print('videopath')
     print(video_path)
@@ -270,51 +282,59 @@ def get_video_creative_id_from_file(path,accessToken,ad_account_id):
     print(video)
     return video['id']
 
-db_obj = Interact_with_DB()
-users= db_obj.getUsersFromDBfile()
-print('execution starts')
-print(users)
-for user in users:
-    if user['auto_launch'] > 0:
-        print('auto launch activated')
-        if user['fb_access_token'] and user['dropbox_access_token']:
-            print('fb and db token found')
 
-            ad_account_id,page_id =set_access_token_page_and_adaccount(access_token = user['fb_access_token'])
-            dbx=dropbox.Dropbox(user['dropbox_access_token'])
-            print('dbx connected')
+def main_cron():   
 
-            if user['last_runned'] == None or datetime.now() - user['last_runned'] >= timedelta(minutes=user['time_delta']):
-                for root_folder in dbx.files_list_folder("").entries:
-                    readyfolderpaths = findReadyFolderPaths(rootFolder=root_folder,usertoken=user['dropbox_access_token'])
-                    print('readyfolder paths')
-                    print(readyfolderpaths)
+    db_obj = Interact_with_DB()
+    users= db_obj.getUsersFromDBfile()
+    logger.info("execution starts")
+    print('execution starts')
+    print(users)
+    for user in users:
+        if user['auto_launch'] > 0:
+            logger.info("auto launch activated")
+            print('auto launch activated')
+            if user['fb_access_token'] and user['dropbox_access_token']:
+                logger.info("fb and db token found")
+                print('fb and db token found')
 
-                    if readyfolderpaths:       
-                        for camp, adsets in readyfolderpaths.items():
-                            print('for camp, adsets in readyfolderpaths.items()')
-                            print(camp,adsets['path'])
-                            campaign_name = camp
-                            path = adsets['path']
+                ad_account_id,page_id =set_access_token_page_and_adaccount(access_token = user['fb_access_token'])
+                dbx=dropbox.Dropbox(user['dropbox_access_token'])
+                logger.info("dbx connected")
+                print('dbx connected')
+
+                if user['last_runned'] == None or datetime.now() - user['last_runned'] >= timedelta(minutes=user['time_delta']):
+                    for root_folder in dbx.files_list_folder("").entries:
+                        readyfolderpaths = findReadyFolderPaths(rootFolder=root_folder,usertoken=user['dropbox_access_token'])
+                        print('readyfolder paths')
+                        print(readyfolderpaths)
+
+                        if readyfolderpaths:       
+                            for camp, adsets in readyfolderpaths.items():
+                                print('for camp, adsets in readyfolderpaths.items()')
+                                print(camp,adsets['path'])
+                                campaign_name = camp
+                                path = adsets['path']
+                                
+                                ready_folder_directory_tree = downloadCampaignFolder(path=path,campaign_name=campaign_name,accessToken=user['dropbox_access_token']) 
+                                print('ready_folder_directory_tree')
+                                print(readyfolderpaths)
+
+                                # Read settings from settings.csv
+                                ad_settings = get_settings_from_csv(campaign_name)
+
+                                launch_campaign(ad_settings=ad_settings,campaign=ready_folder_directory_tree,access_token=user['fb_access_token'],ad_account_id=ad_account_id,page_id=page_id)
+                                logger.info("campaign launched")
+
+                                db_obj.updateLastRunned(last_runned=datetime.now(),dropbox_access_token=user['dropbox_access_token'])
+                                # Move campaign folder to ready folder
+                                launch_folder_path = path.replace('READY','LAUNCHED')
+                                dbx.files_move(from_path=path,to_path=launch_folder_path)
+
+                                #delete downloaded folder from local
+                                folder_path = str(pathlib.Path(__file__).parent.resolve()).replace('\\','/')
+                                shutil.rmtree(folder_path+'/'+campaign_name,"Authors")
                             
-                            ready_folder_directory_tree = downloadCampaignFolder(path=path,campaign_name=campaign_name,accessToken=user['dropbox_access_token']) 
-                            print('ready_folder_directory_tree')
-                            print(readyfolderpaths)
-
-                            # Read settings from settings.csv
-                            ad_settings = get_settings_from_csv(campaign_name)
-
-                            launch_campaign(ad_settings=ad_settings,campaign=ready_folder_directory_tree,access_token=user['fb_access_token'],ad_account_id=ad_account_id,page_id=page_id)
-
-                            db_obj.updateLastRunned(last_runned=datetime.now(),dropbox_access_token=user['dropbox_access_token'])
-                            # Move campaign folder to ready folder
-                            launch_folder_path = path.replace('READY','LAUNCHED')
-                            dbx.files_move(from_path=path,to_path=launch_folder_path)
-
-                            #delete downloaded folder from local
-                            folder_path = os.getcwd().replace('\\','/')
-                            shutil.rmtree(folder_path+'/'+campaign_name,"Authors")
-                        
-                            # user.last_runned = datetime.now()
-                    else:
-                        print('no campaigns to launch in '+root_folder.name )
+                                # user.last_runned = datetime.now()
+                        else:
+                            print('no campaigns to launch in '+root_folder.name )
