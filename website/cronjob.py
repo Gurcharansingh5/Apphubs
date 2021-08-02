@@ -150,13 +150,15 @@ def set_access_token_page_and_adaccount(access_token):
     print('set_access_token_page_and_adaccount')
     print(access_token)
     r = requests.get('https://graph.facebook.com/v11.0/me/adaccounts?access_token='+access_token).json()
-    os.environ['AD_ACCOUNT_ID']= r['data'][0]['id']
+    AD_ACCOUNT_ID= r['data'][0]['id']
 
     r = requests.get('https://graph.facebook.com/v11.0/me/accounts?access_token='+access_token).json()
-    os.environ['PAGE_ID'] = r['data'][0]['id']
+    PAGE_ID = r['data'][0]['id']
 
-def get_video_creative_id_from_file(path,accessToken):
-    AD_ACCOUNT_ID = os.environ['AD_ACCOUNT_ID']
+    return AD_ACCOUNT_ID,PAGE_ID
+
+def get_video_creative_id_from_file(path,accessToken,ad_account_id):
+    AD_ACCOUNT_ID = ad_account_id
     FB_USER_ACCESS_TOKEN = accessToken
     ### Setup session and api objects
     session = FacebookSession(credentials.FB_CLIENT_ID,credentials.FB_CLIENT_SECRET,FB_USER_ACCESS_TOKEN)
@@ -182,9 +184,9 @@ def get_video_creative_id_from_file(path,accessToken):
     print(video)
     return video['id']
 
-def launch_campaign(campaign,access_token,ad_settings):
-    AD_ACCOUNT_ID=os.environ['AD_ACCOUNT_ID']
-    PAGE_ID=os.environ['PAGE_ID']
+def launch_campaign(campaign,access_token,ad_settings,ad_account_id,page_id):
+    AD_ACCOUNT_ID=ad_account_id
+    PAGE_ID=page_id
     
     FacebookAdsApi.init(access_token=access_token)
 
@@ -219,7 +221,7 @@ def launch_campaign(campaign,access_token,ad_settings):
                 if 'children' in adsets:
                     for ads in adsets['children']:
                         print(campaign['name']+'/'+adsets['name']+'/'+ads['name']+ "    jfsidjfidgfagi")
-                        video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'],accessToken=user['fb_access_token'])
+                        video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'],accessToken=user['fb_access_token'],ad_account_id=ad_account_id)
                         print(video_ID)
                         create_ad_creative_params = {
                             'name': 'new Sample Creative',
@@ -240,8 +242,8 @@ def launch_campaign(campaign,access_token,ad_settings):
                         ad_id = AdAccount(AD_ACCOUNT_ID).create_ad(fields=[],params=create_ad_params)
                         print ('ad_id =============='+ad_id['id'])
 
-def get_video_creative_id_from_file(path,accessToken):
-    AD_ACCOUNT_ID = os.environ['AD_ACCOUNT_ID']
+def get_video_creative_id_from_file(path,accessToken,ad_account_id):
+    AD_ACCOUNT_ID = ad_account_id
     FB_USER_ACCESS_TOKEN = accessToken
     ### Setup session and api objects
     session = FacebookSession(credentials.FB_CLIENT_ID,credentials.FB_CLIENT_SECRET,FB_USER_ACCESS_TOKEN)
@@ -278,7 +280,7 @@ for user in users:
         if user['fb_access_token'] and user['dropbox_access_token']:
             print('fb and db token found')
 
-            set_access_token_page_and_adaccount(access_token = user['fb_access_token'])
+            ad_account_id,page_id =set_access_token_page_and_adaccount(access_token = user['fb_access_token'])
             dbx=dropbox.Dropbox(user['dropbox_access_token'])
             print('dbx connected')
 
@@ -302,7 +304,7 @@ for user in users:
                             # Read settings from settings.csv
                             ad_settings = get_settings_from_csv(campaign_name)
 
-                            launch_campaign(ad_settings=ad_settings,campaign=ready_folder_directory_tree,access_token=user['fb_access_token'])
+                            launch_campaign(ad_settings=ad_settings,campaign=ready_folder_directory_tree,access_token=user['fb_access_token'],ad_account_id=ad_account_id,page_id=page_id)
 
                             db_obj.updateLastRunned(last_runned=datetime.now(),dropbox_access_token=user['dropbox_access_token'])
                             # Move campaign folder to ready folder

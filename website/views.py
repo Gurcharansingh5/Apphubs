@@ -40,19 +40,38 @@ def home():
 
         folder_path = os.getcwd().replace('\\','/')
         file_path = folder_path+'/website/functionality.py'
-        command = 'python '+file_path+' '+campaign_name
+        command = 'python3 '+file_path+' '+campaign_name
         print(command)
         t1 = threading.Thread(target=launch_campaign_script, args=(command,))
         t1.start()
         flash('Campaign will be launched in few seconds', category='success')    
 
-    selected_root_folder = request.args.get('root_folder')
+    auto_launch_flag = request.args.get('auto_flag')
+    print('auto_launch_flag')
+    print(auto_launch_flag)
+    
+    if auto_launch_flag == '1':
+        auto_launch_flag= True
+    else:
+        auto_launch_flag= False
+    print(type(auto_launch_flag))
+    
+    time_delta = request.args.get('time_delta')
+    print('time_delta')
+    print(time_delta)
+
     user = User.query.filter_by(email=current_user.email).first()
+    print(user.auto_launch,' ',user.time_delta)
+    user.auto_launch = auto_launch_flag
+    user.time_delta = time_delta
+    db.session.commit()
+
     if user.fb_access_token:
         set_access_token_page_and_adaccount(user.fb_access_token)
 
     rows  = []
     root_folders = []
+    selected_root_folder = request.args.get('root_folder')
     if user.dropbox_access_token:
         os.environ['DROPBOX_ACCESS_TOKEN'] = user.dropbox_access_token
         dbx = dropbox.Dropbox(user.dropbox_access_token)   

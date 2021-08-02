@@ -9,6 +9,26 @@
   {% if user.dropbox_access_token %}
     <p>Dropbox Logged IN</p>
 
+    <!-- <script>
+      function yesnoCheck(that) {
+    if (that.checked == true) {
+        document.getElementById("time_delta").style.display = "block";
+    } else {
+        document.getElementById("time_delta").style.display = "none";
+        document.getElementById("time_delta").value = '';
+
+    }
+}
+    </script> -->
+    <form method="GET" action="/">
+        <input type="checkbox" class="form-check-input" value=1 name="auto_flag" id="auto_flag" {% if user.auto_launch %} checked {% endif %}>
+        <label class="form-check-label" for="exampleCheck1">AUTO</label>
+        <input type="text" class="form-control" id="time_delta" value={{user.time_delta}} name="time_delta">
+        <button type="submit" class="btn btn-outline-warning">UPDATE</button>
+
+    </form>
+    {{user.auto_launch}}
+
     <form method="GET" action="/">
       <select class="form-select" aria-label="Default select example" name='root_folder' onchange="this.form.submit()" >
         <option value="" selected disabled hidden>Choose here</option>
