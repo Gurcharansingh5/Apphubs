@@ -9,17 +9,6 @@
   {% if user.dropbox_access_token %}
     <p>Dropbox Logged IN</p>
 
-    <!-- <script>
-      function yesnoCheck(that) {
-    if (that.checked == true) {
-        document.getElementById("time_delta").style.display = "block";
-    } else {
-        document.getElementById("time_delta").style.display = "none";
-        document.getElementById("time_delta").value = '';
-
-    }
-}
-    </script> -->
     <form method="POST" action="/update_auto_launch">
         <input type="checkbox" class="form-check-input" value=1 name="auto_flag" id="auto_flag" {% if user.auto_launch %} checked {% endif %}>
         <label class="form-check-label" for="exampleCheck1">AUTO</label>
@@ -34,7 +23,6 @@
           <option value="{{folder}}">{{folder}}</option>
         {% endfor %}
       </select>
-      <!-- <button type='submit' class="btn btn-outline-warning">CHECK NOW</button> -->
     </form>
 
 
@@ -96,7 +84,6 @@
       </tbody>
     </table>
 
-    <!-- <button class="btn btn-outline-danger">Launch All</button> -->
     {% else %}
     <div class="alert alert-danger" role="alert">
       There are no Campaigns to Launch

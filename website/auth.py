@@ -2,42 +2,28 @@
 from .models import User
 from . import db
 from . credentials import GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_DISCOVERY_URL
+from website.credentials import FB_AUTHORIZATION_BASE_URL,FB_CLIENT_ID,FB_CLIENT_SECRET,FB_SCOPE,FB_TOKEN_URL,URL
+from . import credentials
 
 # INTERNAL IMPORTS
 import requests,json
 import os
 
 # EXTERNAL IMPORTS
-from flask import Blueprint, render_template, request, flash, redirect, url_for
-from werkzeug.security import  check_password_hash
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_user, login_required, logout_user, current_user
 from oauthlib.oauth2 import WebApplicationClient
-
+import requests_oauthlib
+from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
-
 auth = Blueprint('auth', __name__)
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    # if request.method == 'POST':
-    #     email = request.form.get('email')
-    #     password = request.form.get('password')
-
-    #     user = User.query.filter_by(email=email).first()
-    #     if user:
-    #         if check_password_hash(user.password, password):
-    #             flash('Logged in successfully!', category='success')
-    #             login_user(user, remember=True)
-    #             return redirect(url_for('views.home'))
-    #         else:
-    #             flash('Incorrect password, try again.', category='error')
-    #     else:
-    #         flash('Email does not exist.', category='error')
-
     return render_template("login.html", user=current_user)
-
 
 @auth.route('/logout')
 @login_required
@@ -45,39 +31,8 @@ def logout():
     logout_user()
     return redirect(url_for('auth.login'))
 
-
-# @auth.route('/sign-up', methods=['GET', 'POST'])
-# def sign_up():
-#     if request.method == 'POST':
-#         email = request.form.get('email')
-#         first_name = request.form.get('firstName')
-#         password1 = request.form.get('password1')
-#         password2 = request.form.get('password2')
-
-#         user = User.query.filter_by(email=email).first()
-#         if user:
-#             flash('Email already exists.', category='error')
-#         elif len(email) < 4:
-#             flash('Email must be greater than 3 characters.', category='error')
-#         elif len(first_name) < 2:
-#             flash('First name must be greater than 1 character.', category='error')
-#         elif password1 != password2:
-#             flash('Passwords don\'t match.', category='error')
-#         elif len(password1) < 7:
-#             flash('Password must be at least 7 characters.', category='error')
-#         else:
-#             new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-#                 password1, method='sha256'))
-#             db.session.add(new_user)
-#             db.session.commit()
-#             login_user(new_user, remember=True)
-#             flash('Account created!', category='success')
-#             return redirect(url_for('views.home'))
-
-#     return render_template("sign_up.html", user=current_user)
-
 @auth.route("/loginurl")
-def loginURL():
+def googleLoginURL():
     # Find out what URL to hit for Google login
     google_provider_cfg = get_google_provider_cfg()
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
@@ -89,15 +44,13 @@ def loginURL():
         redirect_uri=request.base_url + "/callback",
         scope=["openid", "email", "profile"],
     )
-    print('request URI')
-    print(request_uri)
     return redirect(request_uri)
 
 def get_google_provider_cfg():
     return requests.get(GOOGLE_DISCOVERY_URL).json()
 
 @auth.route("/loginurl/callback")
-def callback():
+def googleCallback():
     # Get authorization code Google sent back to you
     code = request.args.get("code")
 
@@ -143,12 +96,9 @@ def callback():
 
 
     user = User.query.filter_by(email=users_email).first()
-    print(user)
     if not user:
-        print('no user ')
-        password1 = '121212122'
+        password1 = unique_id
         new_user = User(id=unique_id,email=users_email, first_name= users_name, password=password1)
-        print(users_email)
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user, remember=True)
@@ -161,3 +111,42 @@ def callback():
 
     # return redirect(url_for("index"))
 
+@auth.route("/fb-login")
+def facebookLoginURL():
+	facebook = requests_oauthlib.OAuth2Session(FB_CLIENT_ID, redirect_uri=URL + "/fb-callback", scope=FB_SCOPE)
+	authorization_url, _ = facebook.authorization_url(FB_AUTHORIZATION_BASE_URL)
+
+	return redirect(authorization_url)
+
+@auth.route("/fb-callback")
+def facebookCallback():
+    facebook = requests_oauthlib.OAuth2Session(
+    	FB_CLIENT_ID, scope=FB_SCOPE, redirect_uri=URL + "/fb-callback"
+	)
+
+	# we need to apply a fix for Facebook here
+    facebook = facebook_compliance_fix(facebook)
+    token = facebook.fetch_token(FB_TOKEN_URL, client_secret=FB_CLIENT_SECRET, authorization_response=request.url)
+    user = User.query.filter_by(email=current_user.email).first()
+    user.fb_access_token = token['access_token']
+    db.session.commit()
+    return redirect(url_for('views.home'))
+
+@auth.route('/dropboxlogin')
+def dropboxLoginURL():
+    return credentials.dropbox.authorize(callback=URL+'/login/authorized')
+    
+@auth.route('/login/authorized')
+def dropboxCallback():
+    resp = credentials.dropbox.authorized_response()
+    if resp is None:
+        return 'Access denied: reason=%s error=%s' % (
+            request.args['error'],
+            request.args['error_description']
+        )
+    session['dropbox_token'] = (resp['access_token'], '')
+    user = User.query.filter_by(email=current_user.email).first()
+    user.dropbox_access_token = resp['access_token']
+    db.session.commit()
+
+    return redirect(url_for('views.home'))

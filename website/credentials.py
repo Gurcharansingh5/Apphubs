@@ -11,14 +11,12 @@ FB_CLIENT_SECRET="bc5fa70ff4ff8dd693f804ba4f0db80c"
 FB_AUTHORIZATION_BASE_URL = "https://www.facebook.com/dialog/oauth"
 FB_TOKEN_URL = "https://graph.facebook.com/oauth/access_token"
 FB_SCOPE = ["email","ads_management"]
-URL = "https://88a19af99acb.ngrok.io"
+URL = "https://25c40d387c63.ngrok.io"
 
 
 
 # DROPBOX CREDENTIALS
 DROPBOX_CONSUMER_KEY='j3x8xr8e9aqg1gb'
 DROPBOX_CONSUMER_SECRET='kn7mpqs64v0ac8y'
-
-
 
 dropbox=''

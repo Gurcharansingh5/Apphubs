@@ -9,17 +9,18 @@ import shutil
 import sys
 import requests
 
-# external imports
+# EXTERNAL IMPORTS
 from zipfile import ZipFile
 import dropbox
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.api import FacebookAdsApi
 
-
+# getting arguments from command
 campaign_name=sys.argv[1]
 DROPBOX_ACCESS_TOKEN = sys.argv[2]
 dropbox_ready_folder = sys.argv[3]
 FB_USER_ACCESS_TOKEN = sys.argv[4]
+
 
 def path_to_dict(path):
     d = {'name': os.path.basename(path)}
@@ -75,18 +76,17 @@ def get_settings_from_csv(campaign):
 def set_access_token_page_and_adaccount(access_token):
 
     r = requests.get('https://graph.facebook.com/v11.0/me/adaccounts?access_token='+access_token).json()
-    print(r)
+    # print(r)
     AD_ACCOUNT_ID= r['data'][0]['id']
 
     r = requests.get('https://graph.facebook.com/v11.0/me/accounts?access_token='+access_token).json()
-    print(r)
+    # print(r)
     PAGE_ID= r['data'][0]['id']
 
     return AD_ACCOUNT_ID,PAGE_ID
 
 def launch_campaign(campaign,access_token,ad_settings):
-    AD_ACCOUNT_ID,PAGE_ID = set_access_token_page_and_adaccount(access_token)       
-    
+    AD_ACCOUNT_ID,PAGE_ID = set_access_token_page_and_adaccount(access_token)           
     FacebookAdsApi.init(access_token=access_token)
 
     create_campaign_params = {
