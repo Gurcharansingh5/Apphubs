@@ -86,9 +86,12 @@ def set_access_token_page_and_adaccount(access_token):
     return AD_ACCOUNT_ID,PAGE_ID
 
 def launch_campaign(campaign,access_token,ad_settings):
-    AD_ACCOUNT_ID,PAGE_ID = set_access_token_page_and_adaccount(access_token)           
-    FacebookAdsApi.init(access_token=access_token)
+    try:
+        AD_ACCOUNT_ID,PAGE_ID = set_access_token_page_and_adaccount(access_token)           
+    except:
+        print('Valid AD Account or page not found')
 
+    FacebookAdsApi.init(access_token=access_token)
     create_campaign_params = {
                 'name': campaign['name'],
                 'objective': ad_settings['campaign_objective'],                

@@ -37,7 +37,7 @@
         <tr>
           <th scope="col">SKU Name</th>
           <th scope="col">Campaign</th>
-          <th scope="col">Settings</th>
+          <th scope="col">SETTINGS</th>
           <th scope="col">Adsets</th>
           <th scope="col">Creative</th>
           <th scope="col"></th>
@@ -56,7 +56,11 @@
               </td>
   
               <td>
-                {{row.settings}}
+                {% for key,value in row.settings.items() %}
+                  {{key}} : {{value}}
+              </br>
+                {% endfor %}
+
               </td>
   
               <td>
@@ -68,8 +72,9 @@
   
               <td>
                 {% for ad in row.ads %}
-                  {{ad.resource}}
-                  <br>
+                  {% for creative in ad.resource %}
+                    {{creative}}<br>
+                  {% endfor %}
                 {% endfor %}
               </td>
   
