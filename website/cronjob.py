@@ -34,21 +34,29 @@ class Interact_with_DB:
 
     def getUsersFromDBfile(self):        
         cursor = self.conn.cursor()
-        cursor.execute("SELECT fb_access_token,dropbox_access_token,auto_launch,last_runned,time_delta FROM user;") 
+        cursor.execute("SELECT id,auto_launch,last_runned,time_delta FROM user;") 
         queryset= cursor.fetchall() 
         users=[]
         for row in queryset:
-            print('enteres')
             user={}
-            user['fb_access_token']=row[0]
-            user['dropbox_access_token']=row[1]
-            user['auto_launch']=row[2]
+            fb_query = "SELECT access_token FROM social_details WHERE user_id='"+row[0]+"' AND type='facebook' AND is_deleted=False"            
+            cursor.execute(fb_query)
+            fb_queryset= cursor.fetchone() 
+            user['fb_access_token']=fb_queryset[0]
+
+            db_query = "SELECT access_token FROM social_details WHERE user_id='"+row[0]+"' AND type='dropbox' AND is_deleted=False"            
+            cursor.execute(db_query)
+            db_queryset= cursor.fetchone() 
+            user['dropbox_access_token']=db_queryset[0]
+            
+            print('enteres')
+            user['auto_launch']=row[1]
             user['last_runned']= None
 
-            if row[3] :
-                user['last_runned']= datetime.fromisoformat(row[3])
+            if row[2] :
+                user['last_runned']= datetime.fromisoformat(row[2])
             
-            user['time_delta'] = row[4]
+            user['time_delta'] = row[3]
             print(user)
             users.append(user)
         print(users)

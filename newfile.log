@@ -1,5 +1,0 @@
-2021-08-02 14:37:29,624 execution starts
-2021-08-02 14:37:29,639 auto launch activated
-2021-08-02 14:37:29,641 fb and db token found
-2021-08-02 14:37:29,674 Starting new HTTPS connection (1): graph.facebook.com:443
-2021-08-02 14:37:30,093 https://graph.facebook.com:443 "GET /v11.0/me/adaccounts?access_token=EAAgEjhopC7UBAKQ34lkqgOqLnlqIDu3G0qEgdAd3Nzvb4lOJo03DtVIVo5lskd3zsQYsw4lRpoZCkXyHARSw6x5cNNGE87NGt5j1f5ZApjUXNp9BXgMUNPjGDV1yPJ5ZC6nv7FjtO3jnkeLz2LZAJScd6hyBZAjERbwfzngENdbi3EpoMn8auZBuqNApelhicZD HTTP/1.1" 400 220

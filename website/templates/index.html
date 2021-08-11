@@ -78,13 +78,12 @@
                 </div>
               </div>
             </div>
-
+            {% if rows %}
             <div class="row">
               <div class="row flex-grow">
                 <div class="col-12 grid-margin stretch-card">
                   <div class="card card-rounded">
                     <div class="card-body">
-                      {% if rows %}
                       <div class="table-responsive  mt-1">
                         <table class="table select-table">
                           <thead>
@@ -149,32 +148,26 @@
                             {% endfor %}
                           </tbody>
                         </table>
-                          
+
 
                       </div>
-                      {% endif %}
                     </div>
-                   
+
                   </div>
                 </div>
                 <div class="a_tag" style="text-align: center !important;">
-                 <a href="/campaigns">View all</a>
-                 </div>
+                  <a href="/campaigns">View all</a>
+                </div>
               </div>
             </div>
+            {% endif %}
+
 
           </div>
         </div>
       </div>
     </div>
   </div>
-  <footer class="footer">
-    <div class="d-sm-flex justify-content-center justify-content-sm-between">
-      <span class="text-muted text-center text-sm-left d-block d-sm-inline-block"> <a href="#"
-          target="_blank">AppHub</a> </span>
-      <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2021. All rights
-        reserved.</span>
-    </div>
-  </footer>
+
 </div>
 {% endblock %}

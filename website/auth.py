@@ -112,7 +112,6 @@ def googleCallback():
     # Send user back to homepage
     return redirect(url_for('views.home'))
 
-    # return redirect(url_for("index"))
 
 @auth.route("/fb-login")
 def facebookLoginURL():

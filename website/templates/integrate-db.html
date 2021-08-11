@@ -40,26 +40,14 @@
             <div class="card">
                 <div class="card-body">
                     <form method="POST" action="/integrate_db">
-                        <select class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuSizeButton2" data-bs-toggle="dropdown class="form-select" aria-label="Default select example" name='root_folder' onchange="this.form.submit()" >
-                            <option value="" selected disabled hidden>Choose here</option>
+                        <select class="form-select" aria-label="Default select example" name='root_folder' onchange="this.form.submit()" >
+                            <option value="" selected disabled hidden>Select Root folder</option>
                             {% for folder in root_folders %}
-                              <option  value="{{folder}}">{{folder}}</option>
+                            <option value="{{folder}}">{{folder}}</option>
                             {% endfor %}
-                          </select>
-                        <!-- <div class="dropdown">
-                            <select class="btn btn-primary dropdown-toggle" id="dropdownMenuSizeButton2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" name='root_folder' onchange="this.form.submit()" >
-
-                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuSizeButton2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Select Root Folder
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuSizeButton2">
-                                <a class="dropdown-item" href="#">Action</a>
-                                <a class="dropdown-item" href="#">Another action</a>
-
-                            </div>
-                        </div> -->
+                        </select>                   
                     </form>
-                    <p>Choosed root folder :</p>{{user.root_folder}}
+                    <b>Choosed root folder :</b>{{user.root_folder}}
                 </div>
             </div>
         </div>

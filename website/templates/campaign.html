@@ -2,12 +2,12 @@
 
 {% block mainpanel %}
 <div class="content-wrapper">
+    {% if rows %}
     <div class="row">
         <div class="row flex-grow">
         <div class="col-12 grid-margin stretch-card">
             <div class="card card-rounded">
             <div class="card-body">
-                {% if rows %}
                 <div class="table-responsive  mt-1">
                 <table class="table select-table">
                     <thead>
@@ -73,12 +73,13 @@
                     </tbody>
                 </table>
                 </div>
-                {% endif %}
             </div>
             </div>
         </div>
         </div>
     </div>
+                    {% endif %}
+
 
 </div>
 {% endblock %}
