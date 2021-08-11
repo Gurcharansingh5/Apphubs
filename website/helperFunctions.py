@@ -9,27 +9,32 @@ import dropbox
 def launch_campaign_script(command):
     os.system(command) 
 
-def getRowsFromReadyPath(readyfolderpaths,access_token):
+def getRowsFromReadyPath(readyfolderpaths,access_token,count):
     rows  = []
+    counter = 0
     for camp, adsets in readyfolderpaths.items():
-        path = adsets['path']
-        campaign_settings = get_campaign_settings_from_csv(path=path,access_token=access_token)
+        con = True if count == 0 else counter < count
+        if con : 
+            path = adsets['path']
+            campaign_settings = get_campaign_settings_from_csv(path=path,access_token=access_token)
 
-        SKU = adsets['SKU']
-        item = {}
-        ad_items = []
-        for adsets, resource in adsets.items():
-            if adsets != 'path' and adsets != 'SKU':
-                ad_item = {}
-                ad_item['adset'] = adsets
-                ad_item['resource'] = resource
-                ad_items.append(ad_item)
-        item['camp'] = camp
-        item['path'] = path
-        item['ads'] = ad_items
-        item['SKU'] = SKU
-        item['settings'] = campaign_settings
-        rows.append(item)
+            SKU = adsets['SKU']
+            item = {}
+            ad_items = []
+            for adsets, resource in adsets.items():
+                if adsets != 'path' and adsets != 'SKU':
+                    ad_item = {}
+                    ad_item['adset'] = adsets
+                    ad_item['resource'] = resource
+                    ad_items.append(ad_item)
+            item['camp'] = camp
+            item['path'] = path
+            item['ads'] = ad_items
+            item['SKU'] = SKU
+            item['settings'] = campaign_settings
+            rows.append(item)
+            counter +=1
+        
     return rows
     # print(rows)
     
@@ -46,26 +51,13 @@ def findReadyFolderPaths(rootFolder,access_token):
                     # subentry here is the folders inside SKU folder
                     if subEntry.name == 'READY':
                         for campaigns in dbx.files_list_folder('/'+rootFolder+'/'+entry.name+'/'+subEntry.name).entries:
-                            # print("entry.name")
-                            # print(entry.name)
-
-                            # print("campaigns.name")
-                            # print(campaigns.name)   
-
                             ready_campaign_path= '/'+rootFolder+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
-                            # print('ready_campaign_path')
-                            # print(ready_campaign_path)
-
                             adset={}
                             for adsets in dbx.files_list_folder(ready_campaign_path).entries:
-                                # print(adsets.name)  
                                 if not adsets.name.endswith('.csv'):             
                                     adcreative=[]
                                     ready_adset_path = ready_campaign_path+'/'+adsets.name
-                                    # print('ready_adset_path')
-                                    # print(ready_adset_path)
                                     for adcreatives in dbx.files_list_folder(ready_adset_path).entries:
-                                        # print(adcreatives.name)
                                         adcreative.append(adcreatives.name)
                                     adset[adsets.name] = adcreative
 
@@ -74,8 +66,7 @@ def findReadyFolderPaths(rootFolder,access_token):
                                 campaign[campaigns.name]['SKU'] = entry.name
 
 
-        # print('campaign campaign campaign')
-        # print(campaign)
+
         return campaign
     else:
         return None
@@ -101,10 +92,7 @@ def set_access_token_page_and_adaccount(access_token):
 def fb_token_valid(access_token):
     # print(access_token)
     r = requests.get('https://graph.facebook.com/v11.0/me/?access_token='+access_token).json()
-    # print(r)
-    if 'id' in r:
-        return True
-    else:
-        return False
+    print(r)
+    return True if 'id' in r else False
 
     

@@ -1,0 +1,77 @@
+{% extends "navbar.html" %}
+
+{% block mainpanel %}
+<div class="content-wrapper">
+    <div class="row">
+        {% if fb_social_user %}
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <img src="{{fb_social_user.pic_url}}" style="width: 100px;height:100px; float:right;" />
+                    <h4 class="card-title">Details</h4>
+
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <p>{{fb_social_user.username}}</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <p>{{fb_social_user.email}}</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Last Logged in :</label>
+                        <p>{{fb_social_user.last_logged_in}}</p>
+                    </div>
+                    <div>
+                        <form method="POST" action="/disconnect">
+                        <input type="hidden" value={{fb_social_user.id}} name="social_user">
+                        <button type="submit" class="btn btn-danger">Disconnect</button>                        
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form class="form-inline" method="POST" action="/update_auto_launch" >
+                        <div class="form-check mx-sm-2">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" value=1 name="auto_flag" id="auto_flag" {% if user.auto_launch %} checked {% endif %}>
+                                Auto
+                            </label>
+                        </div>
+                        <label class="sr-only" for="inlineFormInputName2">Minutes</label>
+                        <input type="text" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2" id="time_delta" value={{user.time_delta}} name="time_delta"
+                            placeholder="Hours">
+
+                        <button type="submit" class="btn btn-primary mb-2">Update</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+           <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Please Connect with facebook</h4> 
+                    <div>
+                        <a href="/fb-login"><button type="button" class="btn btn-primary">Connect with Facebook</button></a>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}
+</body>
+
+</html>

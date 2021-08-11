@@ -1,0 +1,85 @@
+{% extends "navbar.html" %}
+
+{% block mainpanel %}
+<div class="content-wrapper">
+    <div class="row">
+    {% if db_social_user %}
+        <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <img src="{{db_social_user.pic_url}}" style="width: 100px;height:100px; float:right;" />
+                    <h4 class="card-title">Details</h4>
+
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <p>{{db_social_user.username}}</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <p>{{db_social_user.email}}</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Last Logged in :</label>
+                        <p>{{db_social_user.last_logged_in}}</p>
+                    </div>
+
+                    <div>
+                        <form method="POST" action="/disconnect">
+                            <input type="hidden" value={{db_social_user.id}} name="social_user">
+                            <button type="submit" class="btn btn-danger">Disconnect</button>                        
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" action="/integrate_db">
+                        <select class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuSizeButton2" data-bs-toggle="dropdown class="form-select" aria-label="Default select example" name='root_folder' onchange="this.form.submit()" >
+                            <option value="" selected disabled hidden>Choose here</option>
+                            {% for folder in root_folders %}
+                              <option  value="{{folder}}">{{folder}}</option>
+                            {% endfor %}
+                          </select>
+                        <!-- <div class="dropdown">
+                            <select class="btn btn-primary dropdown-toggle" id="dropdownMenuSizeButton2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" name='root_folder' onchange="this.form.submit()" >
+
+                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuSizeButton2" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Select Root Folder
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuSizeButton2">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+
+                            </div>
+                        </div> -->
+                    </form>
+                    <p>Choosed root folder :</p>{{user.root_folder}}
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+                <div class="col-md-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Please Connect with Dropbox</h4>          
+                    <div>
+                        <a href="/dropboxlogin"><button type="button" class="btn btn-primary">Connect with Dropbox</button></a>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+</body>
+
+</html>

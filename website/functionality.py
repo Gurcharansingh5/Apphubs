@@ -76,11 +76,11 @@ def get_settings_from_csv(campaign):
 def set_access_token_page_and_adaccount(access_token):
 
     r = requests.get('https://graph.facebook.com/v11.0/me/adaccounts?access_token='+access_token).json()
-    # print(r)
+    print(r)
     AD_ACCOUNT_ID= r['data'][0]['id']
 
     r = requests.get('https://graph.facebook.com/v11.0/me/accounts?access_token='+access_token).json()
-    # print(r)
+    print(r)
     PAGE_ID= r['data'][0]['id']
 
     return AD_ACCOUNT_ID,PAGE_ID

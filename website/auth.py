@@ -1,5 +1,5 @@
 # INNER IMPORTS
-from .models import User
+from .models import User,SocialDetails
 from . import db
 from . credentials import GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_DISCOVERY_URL
 from website.credentials import FB_AUTHORIZATION_BASE_URL,FB_CLIENT_ID,FB_CLIENT_SECRET,FB_SCOPE,FB_TOKEN_URL,URL
@@ -8,6 +8,8 @@ from . import credentials
 # INTERNAL IMPORTS
 import requests,json
 import os
+from datetime import datetime
+from dateutil import tz
 
 # EXTERNAL IMPORTS
 from flask import Blueprint, render_template, request, redirect, url_for, session
@@ -15,6 +17,7 @@ from flask_login import login_user, login_required, logout_user, current_user
 from oauthlib.oauth2 import WebApplicationClient
 import requests_oauthlib
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
+
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
@@ -127,9 +130,28 @@ def facebookCallback():
 	# we need to apply a fix for Facebook here
     facebook = facebook_compliance_fix(facebook)
     token = facebook.fetch_token(FB_TOKEN_URL, client_secret=FB_CLIENT_SECRET, authorization_response=request.url)
-    user = User.query.filter_by(email=current_user.email).first()
-    user.fb_access_token = token['access_token']
+
+    # Fetch a protected resource, i.e. user profile, via Graph API
+    facebook_user_data = facebook.get("https://graph.facebook.com/me?fields=id,name,email,picture{url}").json()
+
+    # get current time
+    from_zone = tz.tzutc()
+    to_zone = tz.tzlocal()
+    utc = datetime.utcnow()
+    utc = utc.replace(tzinfo=from_zone)
+    central = utc.astimezone(to_zone)
+
+    new_social_user = SocialDetails(user_id = current_user.id,
+                            type = 'facebook',
+                            email = facebook_user_data["email"],
+                            username = facebook_user_data["name"],
+                            pic_url = facebook_user_data.get("picture", {}).get("data", {}).get("url"),
+                            access_token = token['access_token'],
+                            last_logged_in = central
+                            )
+    db.session.add(new_social_user)
     db.session.commit()
+
     return redirect(url_for('views.home'))
 
 @auth.route('/dropboxlogin')
@@ -139,14 +161,35 @@ def dropboxLoginURL():
 @auth.route('/login/authorized')
 def dropboxCallback():
     resp = credentials.dropbox.authorized_response()
+    print('^&^&^&^&^&^&^&^&^&^&^&^&^&')
+    print(resp)
     if resp is None:
         return 'Access denied: reason=%s error=%s' % (
             request.args['error'],
             request.args['error_description']
         )
+    dropbox_access_token = resp['access_token']
     session['dropbox_token'] = (resp['access_token'], '')
-    user = User.query.filter_by(email=current_user.email).first()
-    user.dropbox_access_token = resp['access_token']
+
+    # Fetch a protected resource, i.e. user profile
+    dropbox_user_data = requests.post('https://api.dropboxapi.com/2/users/get_current_account', headers={"Authorization": f"Bearer {dropbox_access_token}"}).json()
+
+    # get current time
+    from_zone = tz.tzutc()
+    to_zone = tz.tzlocal()
+    utc = datetime.utcnow()
+    utc = utc.replace(tzinfo=from_zone)
+    central = utc.astimezone(to_zone)
+
+    new_social_user = SocialDetails(user_id = current_user.id,
+                        type = 'dropbox',
+                        email = dropbox_user_data["email"],
+                        username = dropbox_user_data['name']['display_name'],
+                        pic_url = dropbox_user_data['profile_photo_url'],
+                        access_token = dropbox_access_token,
+                        last_logged_in = central.replace(microsecond=0)
+                        )
+    db.session.add(new_social_user)
     db.session.commit()
 
     return redirect(url_for('views.home'))

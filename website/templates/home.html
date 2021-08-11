@@ -1,12 +1,12 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %}
 {% block content%}
 
-  {% if user.fb_access_token %}
+  {% if social_user.facebook.access_token %}
     <p>FB Logged IN</p>
   {% else %}
     <a class="nav-item nav-link" id="login" href="/fb-login">Connect facebook</a>
   {% endif %}
-  {% if user.dropbox_access_token %}
+  {% if social_user.dropbox.access_token %}
     <p>Dropbox Logged IN</p>
 
     <form method="POST" action="/update_auto_launch">

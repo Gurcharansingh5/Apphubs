@@ -1,0 +1,180 @@
+{% extends "navbar.html" %}
+
+{% block mainpanel %}
+<div class="content-wrapper">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="home-tab">
+        <div class="tab-content tab-content-basic">
+          <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
+
+            <div class="row">
+              <div class="col-lg-6 d-flex flex-column">
+                <div class="row flex-grow">
+                  <div class="col-12 grid-margin stretch-card">
+                    <div class="card card-rounded table-darkBGImg">
+                      <div class="card-body">
+                        <svg style="width:70px;height:150px;float:right;color:white;" viewBox="0 0 24 24">
+                          <path fill="currentColor"
+                            d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96A10 10 0 0 0 22 12.06C22 6.53 17.5 2.04 12 2.04Z" />
+                        </svg>
+                        <div class="col-sm-8">
+                          {% if social_user.facebook.access_token %}
+                          <h3 class="text-white upgrade-info mb-0">
+                            You are ready to launch <span class="fw-bold">Campaign</span>
+                          </h3>
+                          <p class="btn btn-info upgrade-btn">Facebook Connected</p>
+
+                          {% else %}
+                          <h3 class="text-white upgrade-info mb-0">
+                            Enhance your <span class="fw-bold">Campaign</span> for better outreach
+                          </h3>
+                          <a href="/fb-login" class="btn btn-info upgrade-btn">Connect with
+                            Facebook</a>
+
+                          {% endif %}
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="col-lg-6 d-flex flex-column">
+                <div class="row flex-grow">
+                  <div class="col-md-12 col-lg-12 grid-margin stretch-card">
+                    <div class="card bg-primary card-rounded">
+                      <div class="card-body pb-0">
+                        <svg style="width: 70px;height:150px; float:right;" viewBox="0 0 24 24">
+                          <path style="color: white;" fill="currentColor"
+                            d="M3 6.2L8 9.39L13 6.2L8 3L3 6.2M13 6.2L18 9.39L23 6.2L18 3L13 6.2M3 12.55L8 15.74L13 12.55L8 9.35L3 12.55M18 9.35L13 12.55L18 15.74L23 12.55L18 9.35M8.03 16.8L13.04 20L18.04 16.8L13.04 13.61L8.03 16.8Z" />
+                        </svg>
+
+                        <div class="row">
+                          <div class="col-sm-10">
+                            {% if social_user.dropbox.access_token %}
+                            <h3 class="text-white upgrade-info mb-0">
+                              You are ready to launch <span class="fw-bold">Campaign</span>
+                            </h3>
+                            <p class="btn btn-info upgrade-btn">Dropbox Connected</p>
+
+                            {% else %}
+                            <h3 class="text-white upgrade-info mb-0">
+                              Connect your <span class="fw-bold">Dropbox</span> for better outreach
+                            </h3>
+                            <a href="/dropboxlogin" class="btn btn-info upgrade-btn">Connect with
+                              Dropbox</a>
+
+                            {% endif %}
+
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="row flex-grow">
+                <div class="col-12 grid-margin stretch-card">
+                  <div class="card card-rounded">
+                    <div class="card-body">
+                      {% if rows %}
+                      <div class="table-responsive  mt-1">
+                        <table class="table select-table">
+                          <thead>
+                            <tr>
+                              <th><b style="color: black;font-size:18px;">SKU Name</b></th>
+                              <th><b style="color: black;font-size:18px;">Campaign</b></th>
+                              <th><b style="color: black;font-size:18px;">Settings</b></th>
+                              <th><b style="color: black;font-size:18px;">Adsets</b></th>
+                              <th><b style="color: black;font-size:18px;">Creative</b></th>
+                              <th><b style="color: black;font-size:18px;">Action</b></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for row in rows %}
+                            <form method="POST" action="/launch_campaign">
+                              <tr>
+                                <td>
+                                  {{row.SKU}}
+                                </td>
+
+                                <td>
+                                  <div class="d-flex ">
+                                    <input type="hidden" value="{{row.camp}}" name='campaign'>
+                                    <div>
+                                      <p>{{row.camp}}</p>
+                                    </div>
+                                  </div>
+                                </td>
+
+                                <td>
+                                  <p>
+                                    {% for key,value in row.settings.items() %}
+                                    {{key}} : {{value}}
+                                    <br>
+                                    {% endfor %}
+                                  </p>
+                                </td>
+
+                                <td>
+                                  <div>
+                                    {% for ad in row.ads %}
+                                    <p>{{ad.adset}}</p>
+                                    <br>
+                                    {% endfor %}
+                                  </div>
+                                </td>
+
+                                <td>
+                                  {% for ad in row.ads %}
+                                  {% for creative in ad.resource %}
+                                  <p>{{creative}}</p><br>
+                                  {% endfor %}
+                                  {% endfor %}
+                                </td>
+
+                                <td>
+                                  <input type="hidden" value="{{row.path}}" name='path'>
+                                  <button class="badge badge-opacity-success">Launch</button>
+                                </td>
+                              </tr>
+                            </form>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                          
+
+                      </div>
+                      {% endif %}
+                    </div>
+                   
+                  </div>
+                </div>
+                <div class="a_tag" style="text-align: center !important;">
+                 <a href="/campaigns">View all</a>
+                 </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <div class="d-sm-flex justify-content-center justify-content-sm-between">
+      <span class="text-muted text-center text-sm-left d-block d-sm-inline-block"> <a href="#"
+          target="_blank">AppHub</a> </span>
+      <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2021. All rights
+        reserved.</span>
+    </div>
+  </footer>
+</div>
+{% endblock %}
