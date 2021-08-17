@@ -1,0 +1,88 @@
+{% extends "navbar.html" %}
+
+{% block mainpanel %}
+<div class="content-wrapper">
+    {% if rows %}
+    <div class="row">
+        <div class="row flex-grow">
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card card-rounded">
+            <div class="card-body">
+                <div class="table-responsive  mt-1">
+                <table class="table select-table">
+                    <thead>
+                    <tr>
+                        <th><b style="color: black;font-size:18px;">SKU Name</b></th>
+                        <th><b style="color: black;font-size:18px;">Campaign</b></th>
+                        <th><b style="color: black;font-size:18px;">Settings</b></th>
+                        <th><b style="color: black;font-size:18px;">Adsets</b></th>
+                        <th><b style="color: black;font-size:18px;">Creative</b></th>
+                        <th><b style="color: black;font-size:18px;">Action</b></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in rows %}
+                    <form method="POST" action="/launch_campaign">
+                        <tr>
+                        <td>
+                            {{row.SKU}}
+                        </td>
+
+                        <td>
+                            <div class="d-flex ">
+                            <input type="hidden" value="{{row.camp}}" name='campaign'>
+                            <div>
+                                <p>{{row.camp}}</p>
+                            </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <p>
+                            {% for key,value in row.settings.items() %}
+                            {{key}} : {{value}}
+                            <br>
+                            {% endfor %}
+                            </p>
+                        </td>
+
+                        <td>
+                            <div>
+                            {% for ad in row.ads %}
+                            <p>{{ad.adset}}</p>
+                            <br>
+                            {% endfor %}
+                            </div>
+                        </td>
+
+                        <td>
+                            {% for ad in row.ads %}
+                            {% for creative in ad.resource %}
+                            <p>{{creative}}</p><br>
+                            {% endfor %}
+                            {% endfor %}
+                        </td>
+
+                        <td>
+                            <input type="hidden" value="{{row.path}}" name='path'>
+                            <button class="badge badge-opacity-success">Launch</button>
+                        </td>
+                        </tr>
+                    </form>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+                    {% endif %}
+
+
+</div>
+{% endblock %}
+</body>
+
+</html>

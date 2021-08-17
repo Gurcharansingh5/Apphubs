@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content%}
+
+<div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+      <div class="content-wrapper d-flex align-items-center auth px-0">
+        <div class="row w-100 mx-0">
+          <div class="col-lg-4 mx-auto">
+            <div class="auth-form-light text-left py-5 px-4 px-sm-5">
+              
+                <h2>App<span>Hub</span></h2>
+            
+              <h4>Hello! let's get started</h4>
+              <h6 class="fw-light">Sign in to continue.</h6>
+              <form class="pt-3">                
+                <div class="mb-2">
+                <a href='/loginurl' >
+                    <button  href="/loginurl" type="button" class="google-new btn-block">
+                    <i class="ti-google me-2 ml-3"></i>
+                    <span>Connect using Google</span>
+                    </button>
+                </a>
+
+                </div>                
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

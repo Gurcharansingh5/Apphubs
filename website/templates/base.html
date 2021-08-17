@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+    <title>AppHub</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/feather/feather.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/mdi/css/materialdesignicons.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/ti-icons/css/themify-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/typicons/typicons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/simple-line-icons/css/simple-line-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/css/vendor.bundle.base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/vertical-layout-light/style.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/select.dataTables.min.css') }}">
+
+
+</head>
+
+<body>
+
+    <!-- {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    {% if category == 'error' %}
+    <div class="alert alert-danger alter-dismissable fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% else %}
+    <div class="alert alert-success alter-dismissable fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endif %} {% endfor %} {% endif %} {% endwith %} -->
+
+    {% block content %} {% endblock %}
+    
+
+
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/vendor.bundle.base.js') }}"></script>
+    <script type="text/javascript"
+        src="{{ url_for('static', filename='/js/progressbar.js/progressbar.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/dashboard.js') }}"></script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/off-canvas.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/hoverable-collapse.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/template.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/settings.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/todolist.js') }}"></script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/typeahead.js/typeahead.bundle.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='/js/select2/select2.min.js') }}"></script>
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+body {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    background-color: #8e94ba !important;
+} 
+
+.container {
+    margin-top: 100px;
+}
+  
+.signup-form {
+    color: #body {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    background-color: #8e94ba !important;
+} 
+
+.container {
+    margin-top: 100px;
+}
+  
+.signup-form {
+    color: #4285f4;
+    width: 100%;
+    max-width: 550px;
+    margin:0 auto;
+    border-radius: 3px;
+    background: #f2f3f7;
+    box-shadow: 0px 0px 19px rgb(0 0 0 / 30%);
+    padding: 60px;
+    border: 1px solid #999999;
+    text-align: center;
+    font-family: math;
+
+}
+  
+.info {
+color: black;
+text-align: left;
+margin: 13px 121px 0px;
+
+
+}
+
+.signup-form .form-group {
+padding-top: 14px;
+}
+
+@media screen and (max-width: 480px) {
+    .signup-form {
+        padding: 30px;
+    }
+};
+    width: 100%;
+    max-width: 550px;
+    margin:0 auto;
+    border-radius: 3px;
+    background: #f2f3f7;
+    box-shadow: 0px 0px 19px rgb(0 0 0 / 30%);
+    padding: 60px;
+    border: 1px solid #999999;
+    text-align: center;
+    font-family: math;
+
+}
+  
+.info {
+color: black;
+text-align: left;
+margin: 13px 121px 0px;
+
+
+}
+
+.signup-form .form-group {
+padding-top: 14px;
+}
+
+@media screen and (max-width: 480px) {
+    .signup-form {
+        padding: 30px;
+    }
+}
+
+.brand-logo {
+    color: #4285f4 !important;
+    /* font-family: math; */
+}

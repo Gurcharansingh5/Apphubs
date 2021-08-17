@@ -1,0 +1,4 @@
+.vscode
+website/__pycache__
+apphubENV
+website/database.db
