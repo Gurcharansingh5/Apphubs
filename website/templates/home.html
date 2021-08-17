@@ -1,102 +1,103 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %}
 {% block content%}
 
-  {% if social_user.facebook.access_token %}
-    <p>FB Logged IN</p>
-  {% else %}
-    <a class="nav-item nav-link" id="login" href="/fb-login">Connect facebook</a>
-  {% endif %}
-  {% if social_user.dropbox.access_token %}
-    <p>Dropbox Logged IN</p>
+{% if social_user.facebook.access_token %}
+<p>FB Logged IN</p>
+{% else %}
+<a class="nav-item nav-link" id="login" href="/fb-login">Connect facebook</a>
+{% endif %}
+{% if social_user.dropbox.access_token %}
+<p>Dropbox Logged IN</p>
 
-    <form method="POST" action="/update_auto_launch">
-        <input type="checkbox" class="form-check-input" value=1 name="auto_flag" id="auto_flag" {% if user.auto_launch %} checked {% endif %}>
-        <label class="form-check-label" for="exampleCheck1">AUTO</label>
-        <input type="text" class="form-control" id="time_delta" value={{user.time_delta}} name="time_delta">
-        <button type="submit" class="btn btn-outline-warning">UPDATE</button>
+<form method="POST" action="/update_auto_launch">
+  <input type="checkbox" class="form-check-input" value=1 name="auto_flag" id="auto_flag" {% if user.auto_launch %}
+    checked {% endif %}>
+  <label class="form-check-label" for="exampleCheck1">AUTO</label>
+  <input type="text" class="form-control" id="time_delta" value={{user.time_delta}} name="time_delta">
+  <button type="submit" class="btn btn-outline-warning">UPDATE</button>
+</form>
+
+<form method="GET" action="/">
+  <select class="form-select" aria-label="Default select example" name='root_folder' onchange="this.form.submit()">
+    <option value="" selected disabled hidden>Choose here</option>
+    {% for folder in root_folders %}
+    <option value="{{folder}}">{{folder}}</option>
+    {% endfor %}
+  </select>
+</form>
+
+
+{% else %}
+<a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
+{% endif %}
+
+{% if rows %}
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">SKU Name</th>
+      <th scope="col">Campaign</th>
+      <th scope="col">SETTINGS</th>
+      <th scope="col">Adsets</th>
+      <th scope="col">Creative</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <form method="POST" action="/launch_campaign">
+      <tr>
+        <td>
+          {{row.SKU}}
+        </td>
+        <td>
+          <input type="hidden" value="{{row.camp}}" name='campaign'>
+          {{row.camp}}
+        </td>
+
+        <td>
+          {% for key,value in row.settings.items() %}
+          {{key}} : {{value}}
+          </br>
+          {% endfor %}
+
+        </td>
+
+        <td>
+          {% for ad in row.ads %}
+          {{ad.adset}}
+          <br>
+          {% endfor %}
+        </td>
+
+        <td>
+          {% for ad in row.ads %}
+          {% for creative in ad.resource %}
+          {{creative}}<br>
+          {% endfor %}
+          {% endfor %}
+        </td>
+
+        <td>
+          <input type="hidden" value="{{row.path}}" name='path'>
+          <button class="btn btn-primary">Launch</button>
+        </td>
+      </tr>
     </form>
 
-    <form method="GET" action="/">
-      <select class="form-select" aria-label="Default select example" name='root_folder' onchange="this.form.submit()" >
-        <option value="" selected disabled hidden>Choose here</option>
-        {% for folder in root_folders %}
-          <option value="{{folder}}">{{folder}}</option>
-        {% endfor %}
-      </select>
-    </form>
+    {% endfor %}
+  </tbody>
+</table>
 
-
-  {% else %}
-    <a class="nav-item nav-link" href="/dropboxlogin">Connect Dropbox</a>
-  {% endif %}
-
-    {% if rows %}
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">SKU Name</th>
-          <th scope="col">Campaign</th>
-          <th scope="col">SETTINGS</th>
-          <th scope="col">Adsets</th>
-          <th scope="col">Creative</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in rows %}
-          <form method="POST" action="/launch_campaign">
-            <tr>
-              <td>
-                {{row.SKU}}
-              </td>
-              <td>
-                <input type="hidden" value="{{row.camp}}" name='campaign'>
-                {{row.camp}}
-              </td>
-  
-              <td>
-                {% for key,value in row.settings.items() %}
-                  {{key}} : {{value}}
-              </br>
-                {% endfor %}
-
-              </td>
-  
-              <td>
-                {% for ad in row.ads %}
-                  {{ad.adset}}
-                  <br>
-                {% endfor %}
-              </td>
-  
-              <td>
-                {% for ad in row.ads %}
-                  {% for creative in ad.resource %}
-                    {{creative}}<br>
-                  {% endfor %}
-                {% endfor %}
-              </td>
-  
-              <td>
-                  <input type="hidden" value="{{row.path}}" name='path'>
-                  <button class="btn btn-primary">Launch</button>
-              </td>
-            </tr>
-          </form>
-  
-        {% endfor %}
-      </tbody>
-    </table>
-
-    {% else %}
-    <div class="alert alert-danger" role="alert">
-      There are no Campaigns to Launch
-    </div>
-    {% endif %}
+{% else %}
+<div class="alert alert-danger" role="alert">
+  There are no Campaigns to Launch
+</div>
+{% endif %}
 
 
 
 
-  
+
 {% endblock %}

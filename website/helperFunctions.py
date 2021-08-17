@@ -36,11 +36,13 @@ def getRowsFromReadyPath(readyfolderpaths,access_token,count):
             counter +=1
         
     return rows
+    # print(rows)
     
 # function for checking if Ready folder exists
 def findReadyFolderPaths(rootFolder,access_token):
     if rootFolder:
         dbx = dropbox.Dropbox(access_token)   
+        print("[SUCCESS] dropbox account linked")
         campaign={}    
         for entry in dbx.files_list_folder('/'+rootFolder).entries:     
             # entry here is the SKU
@@ -71,6 +73,7 @@ def findReadyFolderPaths(rootFolder,access_token):
 
 def get_campaign_settings_from_csv(path,access_token):
     dbx = dropbox.Dropbox(access_token)   
+    # print("[SUCCESS] dropbox account linked")
     metadata, f = dbx.files_download(path+'/settings.csv')
     csv_reader = csv.reader(f.content.decode().splitlines(), delimiter=',')
     list_of_rows = []  
@@ -87,7 +90,9 @@ def set_access_token_page_and_adaccount(access_token):
     return AD_ACCOUNT_ID,PAGE_ID
 
 def fb_token_valid(access_token):
+    # print(access_token)
     r = requests.get('https://graph.facebook.com/v11.0/me/?access_token='+access_token).json()
+    print(r)
     return True if 'id' in r else False
 
     

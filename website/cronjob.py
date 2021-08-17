@@ -49,6 +49,7 @@ class Interact_with_DB:
             db_queryset= cursor.fetchone() 
             user['dropbox_access_token']=db_queryset[0]
             
+            print('enteres')
             user['auto_launch']=row[1]
             user['last_runned']= None
 
@@ -56,18 +57,22 @@ class Interact_with_DB:
                 user['last_runned']= datetime.fromisoformat(row[2])
             
             user['time_delta'] = row[3]
+            print(user)
             users.append(user)
+        print(users)
         return users
     
     def updateLastRunned(self,last_runned,dropbox_access_token):        
         cursor = self.conn.cursor()
         query = f"UPDATE user SET last_runned='{last_runned}' WHERE dropbox_access_token='{dropbox_access_token}'"
+        print(query)
         cursor.execute(query)   
         self.conn.commit()   
 
 def findReadyFolderPaths(rootFolder,usertoken):
     if rootFolder:
         dbx = dropbox.Dropbox(usertoken)   
+        print("[SUCCESS] dropbox account linked")
         campaign={}    
         for entry in dbx.files_list_folder('/'+rootFolder.name).entries:     
             # entry here is the SKU
@@ -76,15 +81,26 @@ def findReadyFolderPaths(rootFolder,usertoken):
                     # subentry here is the folders inside SKU folder
                     if subEntry.name == 'READY':
                         for campaigns in dbx.files_list_folder('/'+rootFolder.name+'/'+entry.name+'/'+subEntry.name).entries:
+                            # print("entry.name")
+                            # print(entry.name)
+
+                            # print("campaigns.name")
+                            # print(campaigns.name)   
+
                             ready_campaign_path= '/'+rootFolder.name+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
+                            # print('ready_campaign_path')
+                            # print(ready_campaign_path)
 
                             adset={}
                             for adsets in dbx.files_list_folder(ready_campaign_path).entries:
+                                # print(adsets.name)  
                                 if not adsets.name.endswith('.csv'):             
                                     adcreative=[]
                                     ready_adset_path = ready_campaign_path+'/'+adsets.name
-                
+                                    # print('ready_adset_path')
+                                    # print(ready_adset_path)
                                     for adcreatives in dbx.files_list_folder(ready_adset_path).entries:
+                                        # print(adcreatives.name)
                                         adcreative.append(adcreatives.name)
                                     adset[adsets.name] = adcreative
 
@@ -93,7 +109,8 @@ def findReadyFolderPaths(rootFolder,usertoken):
                                 campaign[campaigns.name]['SKU'] = entry.name
 
 
-
+        # print('campaign campaign campaign')
+        # print(campaign)
         return campaign
     else:
         return None
@@ -110,23 +127,30 @@ def path_to_dict(path):
 
 
 def downloadCampaignFolder(path,campaign_name,accessToken):
-    dbx = dropbox.Dropbox(accessToken) 
+    dbx = dropbox.Dropbox(accessToken)  
+    print("downloadCampaignFolder path path")
+    print(path)
 
     folder_path = str(pathlib.Path(__file__).parent.resolve()).replace('\\','/')
     file_name = "READY.zip"
     download_path=folder_path+'/'+file_name
+    print(download_path)
 
     # download folder as zip
     dbx.files_download_zip_to_file(path=path,download_path=download_path)
 
     # extract the downloaded zip
     with ZipFile(download_path, 'r') as zip:
+        print('Extracting all the files now...')
         zip.extractall(folder_path)
+        print('Done!')
     os.remove(folder_path+'/'+file_name)
-
     #convert directory structure to dict
+
     ready_directory_str = json.dumps(path_to_dict(folder_path+'/'+campaign_name))
     ready_directory = json.loads(ready_directory_str)
+    print("downloadCampaignFolder directory tree")
+    print(ready_directory)
     return ready_directory
 
 def get_settings_from_csv(campaign):
@@ -140,10 +164,12 @@ def get_settings_from_csv(campaign):
             list_of_rows.append(row)
 
     res = {list_of_rows[0][i]: list_of_rows[1][i] for i in range(len(list_of_rows[0]))}
+    print("list_of_rows : ", res)
     return res
 
 def set_access_token_page_and_adaccount(access_token):
-
+    print('set_access_token_page_and_adaccount')
+    print(access_token)
     r = requests.get('https://graph.facebook.com/v11.0/me/adaccounts?access_token='+access_token).json()
     AD_ACCOUNT_ID= r['data'][0]['id']
 
@@ -155,16 +181,19 @@ def set_access_token_page_and_adaccount(access_token):
 def get_video_creative_id_from_file(path,accessToken,ad_account_id):
     AD_ACCOUNT_ID = ad_account_id
     FB_USER_ACCESS_TOKEN = accessToken
-
     ### Setup session and api objects
     session = FacebookSession(credentials.FB_CLIENT_ID,credentials.FB_CLIENT_SECRET,FB_USER_ACCESS_TOKEN)
     FacebookAdsApi.set_default_api(FacebookAdsApi(session))
     video = AdVideo(parent_id=AD_ACCOUNT_ID)
 
+    print('get_video_creative_id_from_file')
     path = path.replace('"\"','/')
+    print(path)
 
     folder_path = str(pathlib.Path(__file__).parent.resolve()).replace('\\','/')
     video_path = folder_path+'/'+path
+    print('videopath')
+    print(video_path)
     
     # set video fields
     video[AdVideo.Field.filepath] = video_path
@@ -173,6 +202,7 @@ def get_video_creative_id_from_file(path,accessToken,ad_account_id):
     video.remote_create()
     video.waitUntilEncodingReady()
 
+    print(video)
     return video['id']
 
 def launch_campaign(campaign,access_token,ad_settings,ad_account_id,page_id):
@@ -187,10 +217,13 @@ def launch_campaign(campaign,access_token,ad_settings,ad_account_id,page_id):
                 'status': ad_settings['campaign_status'],
                 'special_ad_categories': [],
     }
+    print('AD_ACCOUNT_ID ',AD_ACCOUNT_ID)
     campaign_id = AdAccount(AD_ACCOUNT_ID).create_campaign(fields=[],params=create_campaign_params)
+    print ('campaign_id =============='+campaign_id['id'])
 
     if 'children' in campaign:
         for adsets in campaign['children']:            
+            print(adsets['name'])
             if not adsets['name'].endswith('.csv'):             
 
                 create_ad_set_params = {
@@ -204,16 +237,20 @@ def launch_campaign(campaign,access_token,ad_settings,ad_account_id,page_id):
                     'status': 'ACTIVE',
                 }
                 ad_set_id = AdAccount(AD_ACCOUNT_ID).create_ad_set(fields=[],params=create_ad_set_params,)
+                print ('ad_set_id =============='+ad_set_id['id'])
 
                 if 'children' in adsets:
                     for ads in adsets['children']:
+                        print(campaign['name']+'/'+adsets['name']+'/'+ads['name']+ "    jfsidjfidgfagi")
                         video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'],accessToken=access_token,ad_account_id=ad_account_id)
+                        print(video_ID)
                         create_ad_creative_params = {
                             'name': 'new Sample Creative',
                             'object_story_spec': {'page_id':PAGE_ID,'video_data':{'image_url':'https://avatars.githubusercontent.com/u/8880186?s=88&u=ccd6fc36312b4d34e68fff60580f18ddddc58729&v=4','video_id':video_ID,'call_to_action':{'type':'INSTALL_MOBILE_APP','value':{'link':"https://play.google.com/store/apps/details?id=com.ludo.king"}}}},
                         }
 
                         adCreative = AdAccount(AD_ACCOUNT_ID).create_ad_creative(fields=[],params=create_ad_creative_params,)
+                        print ('adCreative_id =============='+adCreative['id'])
 
                         create_ad_params = {
 
@@ -224,6 +261,7 @@ def launch_campaign(campaign,access_token,ad_settings,ad_account_id,page_id):
                             'object_story_spec': {'call_to_action':{'type':'LIKE_PAGE','e':{'page':PAGE_ID}}}
                             }
                         ad_id = AdAccount(AD_ACCOUNT_ID).create_ad(fields=[],params=create_ad_params)
+                        print ('ad_id =============='+ad_id['id'])
 
 def get_video_creative_id_from_file(path,accessToken,ad_account_id):
     AD_ACCOUNT_ID = ad_account_id
@@ -232,10 +270,16 @@ def get_video_creative_id_from_file(path,accessToken,ad_account_id):
     session = FacebookSession(credentials.FB_CLIENT_ID,credentials.FB_CLIENT_SECRET,FB_USER_ACCESS_TOKEN)
     FacebookAdsApi.set_default_api(FacebookAdsApi(session))
     video = AdVideo(parent_id=AD_ACCOUNT_ID)
+
+
+    print('get_video_creative_id_from_file')
     path = path.replace('"\"','/')
+    print(path)
 
     folder_path = str(pathlib.Path(__file__).parent.resolve()).replace('\\','/')
     video_path = folder_path+'/'+path
+    print('videopath')
+    print(video_path)
     
     # set video fields
     video[AdVideo.Field.filepath] = video_path
@@ -244,6 +288,7 @@ def get_video_creative_id_from_file(path,accessToken,ad_account_id):
     video.remote_create()
     video.waitUntilEncodingReady()
 
+    print(video)
     return video['id']
 
 
@@ -252,29 +297,38 @@ def main_cron():
     db_obj = Interact_with_DB()
     users= db_obj.getUsersFromDBfile()
     logger.info("execution starts")
+    print('execution starts')
+    print(users)
     for user in users:
         if user['auto_launch'] > 0:
             logger.info("auto launch activated")
+            print('auto launch activated')
             if user['fb_access_token'] and user['dropbox_access_token']:
                 logger.info("fb and db token found")
+                print('fb and db token found')
 
                 ad_account_id,page_id =set_access_token_page_and_adaccount(access_token = user['fb_access_token'])
                 dbx=dropbox.Dropbox(user['dropbox_access_token'])
                 logger.info("dbx connected")
+                print('dbx connected')
 
                 if user['last_runned'] == None or datetime.now() - user['last_runned'] >= timedelta(minutes=user['time_delta']):
                     for root_folder in dbx.files_list_folder("").entries:
                         readyfolderpaths = findReadyFolderPaths(rootFolder=root_folder,usertoken=user['dropbox_access_token'])
-
+                        print('readyfolder paths')
+                        print(readyfolderpaths)
 
                         if readyfolderpaths:       
                             for camp, adsets in readyfolderpaths.items():
-
+                                print('for camp, adsets in readyfolderpaths.items()')
+                                print(camp,adsets['path'])
                                 campaign_name = camp
                                 path = adsets['path']
                                 
                                 ready_folder_directory_tree = downloadCampaignFolder(path=path,campaign_name=campaign_name,accessToken=user['dropbox_access_token']) 
- 
+                                print('ready_folder_directory_tree')
+                                print(readyfolderpaths)
+
                                 # Read settings from settings.csv
                                 ad_settings = get_settings_from_csv(campaign_name)
 
@@ -290,6 +344,7 @@ def main_cron():
                                 folder_path = str(pathlib.Path(__file__).parent.resolve()).replace('\\','/')
                                 shutil.rmtree(folder_path+'/'+campaign_name,"Authors")
                             
+                                # user.last_runned = datetime.now()
                         else:
                             print('no campaigns to launch in '+root_folder.name )
 main_cron()

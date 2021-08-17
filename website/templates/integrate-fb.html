@@ -26,10 +26,10 @@
                     </div>
                     <div>
                         <form method="POST" action="/disconnect">
-                        <input type="hidden" value={{fb_social_user.id}} name="social_user">
-                        <button type="submit" class="btn btn-danger">Disconnect</button>                        
+                            <input type="hidden" value={{fb_social_user.id}} name="social_user">
+                            <button type="submit" class="btn btn-danger">Disconnect</button>
                         </form>
-                        
+
                     </div>
                 </div>
             </div>
@@ -38,29 +38,33 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <form class="form-inline" method="POST" action="/update_auto_launch" >
+                    <form class="form-inline" method="POST" action="/update_auto_launch">
                         <div class="form-check mx-sm-2">
                             <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input" value=1 name="auto_flag" id="auto_flag" {% if user.auto_launch %} checked {% endif %}>
-                                Auto
+                                <input type="checkbox" class="form-check-input" value=1 name="auto_flag" id="auto_flag"
+                                    {% if user.auto_launch %} checked {% endif %}>
+                                Automatically upload the available campaigns to Facebook using scheduler
                             </label>
                         </div>
-                        <label class="sr-only" for="inlineFormInputName2">Minutes</label>
-                        <input type="text" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2" id="time_delta" value={{user.time_delta}} name="time_delta"
-                            placeholder="Hours">
+                        <div class="form-group">
+                            <label for="inlineFormInputName2">After how many minutes system should check for new campaigns?</label>
+                            <input type="text" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2"
+                                id="time_delta" value={{user.time_delta}} name="time_delta" placeholder="Hours">
 
-                        <button type="submit" class="btn btn-primary mb-2">Update</button>
+                            <button type="submit" class="btn btn-primary mb-2">Update</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
         {% else %}
-           <div class="col-md-6 grid-margin stretch-card">
+        <div class="col-md-6 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Please Connect with facebook</h4> 
+                    <h4 class="card-title">Please Connect with facebook</h4>
                     <div>
-                        <a href="/fb-login"><button type="button" class="btn btn-primary">Connect with Facebook</button></a>                        
+                        <a href="/fb-login"><button type="button" class="btn btn-primary">Connect with
+                                Facebook</button></a>
                     </div>
                 </div>
             </div>

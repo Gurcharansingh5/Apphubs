@@ -33,6 +33,7 @@ def home():
         readyfolderpaths = findReadyFolderPaths(rootFolder=current_user.root_folder,access_token=db_social_user.access_token)    
         if readyfolderpaths :
             rows = getRowsFromReadyPath(readyfolderpaths,access_token=db_social_user.access_token,count=3)           
+        print(rows)
     return render_template("index.html",social_user={'facebook':fb_social_user,'dropbox':db_social_user},user=current_user,rows=rows)
 
 
@@ -72,6 +73,7 @@ def list_campaign():
         readyfolderpaths = findReadyFolderPaths(rootFolder=current_user.root_folder,access_token=db_social_user.access_token)    
         if readyfolderpaths :
             rows = getRowsFromReadyPath(readyfolderpaths,access_token=db_social_user.access_token,count=0)           
+        # print(rows)
     return render_template("campaign.html",user=current_user,rows=rows)
 
 
@@ -110,16 +112,19 @@ def launch_campaign():
         db_social_user = SocialDetails.query.filter_by(user_id=current_user.id,type='dropbox',is_deleted=False).first()
         fb_social_user = SocialDetails.query.filter_by(user_id=current_user.id,type='facebook',is_deleted=False).first() 
 
+
         dropbox_ready_folder = request.form.get('path')     
         campaign_name = request.form.get('campaign')
 
         folder_path = os.getcwd().replace('\\','/')
         file_path = folder_path+'/website/functionality.py'
-
         command = f'python {file_path} {campaign_name} {db_social_user.access_token} {dropbox_ready_folder} {fb_social_user.access_token}'
+        print(command)
+
 
         _thread.start_new_thread(launch_campaign_script, (command,))
- 
+        # t1 = threading.Thread(target=launch_campaign_script, args=(command,))
+        # t1.start()
         flash('Campaign will be launched in few seconds', category='success') 
         time.sleep(5)
 

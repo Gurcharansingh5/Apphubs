@@ -35,20 +35,28 @@ def path_to_dict(path):
 dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)  
 
 def downloadCampaignFolder(path,campaign_name):
+    print("downloadCampaignFolder path path")
+    print(path)
+
     folder_path = os.getcwd().replace('\\','/')
     file_name = "READY.zip"
+    print(folder_path+'/'+file_name)
 
     # download folder as zip
     dbx.files_download_zip_to_file(path=path,download_path=folder_path+'/'+file_name)
 
     # extract the downloaded zip
     with ZipFile(file_name, 'r') as zip:
+        print('Extracting all the files now...')
         zip.extractall()
+        print('Done!')
     os.remove(folder_path+'/'+file_name)
-
     #convert directory structure to dict
+
     ready_directory_str = json.dumps(path_to_dict(folder_path+'/'+campaign_name))
     ready_directory = json.loads(ready_directory_str)
+    print("downloadCampaignFolder directory tree")
+    print(ready_directory)
     return ready_directory
 
 def get_settings_from_csv(campaign):
@@ -62,14 +70,17 @@ def get_settings_from_csv(campaign):
             list_of_rows.append(row)
 
     res = {list_of_rows[0][i]: list_of_rows[1][i] for i in range(len(list_of_rows[0]))}
+    print("list_of_rows : ", res)
     return res
 
 def set_access_token_page_and_adaccount(access_token):
 
     r = requests.get('https://graph.facebook.com/v11.0/me/adaccounts?access_token='+access_token).json()
+    print(r)
     AD_ACCOUNT_ID= r['data'][0]['id']
 
     r = requests.get('https://graph.facebook.com/v11.0/me/accounts?access_token='+access_token).json()
+    print(r)
     PAGE_ID= r['data'][0]['id']
 
     return AD_ACCOUNT_ID,PAGE_ID
@@ -87,10 +98,13 @@ def launch_campaign(campaign,access_token,ad_settings):
                 'status': ad_settings['campaign_status'],
                 'special_ad_categories': [],
     }
+    print('AD_ACCOUNT_ID ',AD_ACCOUNT_ID)
     campaign_id = AdAccount(AD_ACCOUNT_ID).create_campaign(fields=[],params=create_campaign_params)
+    print ('campaign_id =============='+campaign_id['id'])
 
     if 'children' in campaign:
         for adsets in campaign['children']:            
+            print(adsets['name'])
             if not adsets['name'].endswith('.csv'):             
 
                 create_ad_set_params = {
@@ -104,16 +118,20 @@ def launch_campaign(campaign,access_token,ad_settings):
                     'status': 'ACTIVE',
                 }
                 ad_set_id = AdAccount(AD_ACCOUNT_ID).create_ad_set(fields=[],params=create_ad_set_params,)
+                print ('ad_set_id =============='+ad_set_id['id'])
 
                 if 'children' in adsets:
                     for ads in adsets['children']:
+                        print(campaign['name']+'/'+adsets['name']+'/'+ads['name']+ "    jfsidjfidgfagi")
                         video_ID = get_video_creative_id_from_file(campaign['name']+'/'+adsets['name']+'/'+ads['name'],access_token=access_token,ad_account_id=AD_ACCOUNT_ID)
+                        print(video_ID)
                         create_ad_creative_params = {
                             'name': 'new Sample Creative',
                             'object_story_spec': {'page_id':PAGE_ID,'video_data':{'image_url':'https://avatars.githubusercontent.com/u/8880186?s=88&u=ccd6fc36312b4d34e68fff60580f18ddddc58729&v=4','video_id':video_ID,'call_to_action':{'type':'INSTALL_MOBILE_APP','value':{'link':"https://play.google.com/store/apps/details?id=com.ludo.king"}}}},
                         }
 
                         adCreative = AdAccount(AD_ACCOUNT_ID).create_ad_creative(fields=[],params=create_ad_creative_params,)
+                        print ('adCreative_id =============='+adCreative['id'])
 
                         create_ad_params = {
 
@@ -124,10 +142,13 @@ def launch_campaign(campaign,access_token,ad_settings):
                             'object_story_spec': {'call_to_action':{'type':'LIKE_PAGE','e':{'page':PAGE_ID}}}
                             }
                         ad_id = AdAccount(AD_ACCOUNT_ID).create_ad(fields=[],params=create_ad_params)
+                        print ('ad_id =============='+ad_id['id'])
 
 
 # download campaign folder(zip) to local, extract it and the directory tree as dict
 directory_tree = downloadCampaignFolder(path=dropbox_ready_folder,campaign_name=campaign_name) 
+print('directory_tree directory_tree')
+print(directory_tree)
 
 # Read settings from settings.csv
 ad_settings = get_settings_from_csv(campaign_name)

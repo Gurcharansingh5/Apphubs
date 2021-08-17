@@ -1,0 +1,52 @@
+2021-08-17 11:20:17,528 execution starts
+2021-08-17 11:20:17,529 auto launch activated
+2021-08-17 11:20:17,530 fb and db token found
+2021-08-17 11:20:17,532 Starting new HTTPS connection (1): graph.facebook.com:443
+2021-08-17 11:20:17,975 https://graph.facebook.com:443 "GET /v11.0/me/adaccounts?access_token=EAAgEjhopC7UBAKi6UxTEhKLpBmp2NZAbBZCl1UopqSzUDa9D9vTXqlhGsQJpiGy6JabprAxEbjFeIAbZB9qljei6i0HgmGskJVcPZBvZAeZB3xBzRrbfziVHBBKXZCw8YFzZALNfyOpVGo0HzDFL21bBLwZATwyI2WeDKhwpvWVrpJYs48KSZAfXTqAAv9M8FBlWgZD HTTP/1.1" 200 164
+2021-08-17 11:20:17,983 Starting new HTTPS connection (1): graph.facebook.com:443
+2021-08-17 11:20:18,431 https://graph.facebook.com:443 "GET /v11.0/me/accounts?access_token=EAAgEjhopC7UBAKi6UxTEhKLpBmp2NZAbBZCl1UopqSzUDa9D9vTXqlhGsQJpiGy6JabprAxEbjFeIAbZB9qljei6i0HgmGskJVcPZBvZAeZB3xBzRrbfziVHBBKXZCw8YFzZALNfyOpVGo0HzDFL21bBLwZATwyI2WeDKhwpvWVrpJYs48KSZAfXTqAAv9M8FBlWgZD HTTP/1.1" 200 820
+2021-08-17 11:20:18,436 dbx connected
+2021-08-17 11:20:18,437 Request to files/list_folder
+2021-08-17 11:20:18,441 Starting new HTTPS connection (1): api.dropboxapi.com:443
+2021-08-17 11:20:19,116 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:19,119 Request to files/list_folder
+2021-08-17 11:20:19,124 Starting new HTTPS connection (1): api.dropboxapi.com:443
+2021-08-17 11:20:19,750 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:19,752 Request to files/list_folder
+2021-08-17 11:20:20,137 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:20,139 Request to files/list_folder
+2021-08-17 11:20:20,508 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:20,510 Request to files/list_folder
+2021-08-17 11:20:20,885 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:20,887 Request to files/list_folder
+2021-08-17 11:20:21,236 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:21,236 Request to files/list_folder
+2021-08-17 11:20:21,622 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:21,630 Request to files/list_folder
+2021-08-17 11:20:22,011 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:22,014 Request to files/list_folder
+2021-08-17 11:20:22,381 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:22,384 Request to files/list_folder
+2021-08-17 11:20:22,762 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:22,764 Request to files/list_folder
+2021-08-17 11:20:23,160 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:23,162 Request to files/list_folder
+2021-08-17 11:20:23,524 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:23,526 Request to files/list_folder
+2021-08-17 11:20:23,904 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:23,906 Request to files/list_folder
+2021-08-17 11:20:24,259 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:24,260 Request to files/list_folder
+2021-08-17 11:20:24,629 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:24,630 Request to files/list_folder
+2021-08-17 11:20:24,993 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:24,995 Request to files/list_folder
+2021-08-17 11:20:25,335 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:25,337 Request to files/list_folder
+2021-08-17 11:20:25,692 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:25,694 Request to files/list_folder
+2021-08-17 11:20:26,059 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:26,061 Request to files/list_folder
+2021-08-17 11:20:26,454 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-17 11:20:26,459 Request to files/download_zip
+2021-08-17 11:20:26,462 Starting new HTTPS connection (1): content.dropboxapi.com:443

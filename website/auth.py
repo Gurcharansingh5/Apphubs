@@ -160,6 +160,8 @@ def dropboxLoginURL():
 @auth.route('/login/authorized')
 def dropboxCallback():
     resp = credentials.dropbox.authorized_response()
+    print('^&^&^&^&^&^&^&^&^&^&^&^&^&')
+    print(resp)
     if resp is None:
         return 'Access denied: reason=%s error=%s' % (
             request.args['error'],
