@@ -74,6 +74,7 @@ def findReadyFolderPaths(rootFolder,usertoken):
         dbx = dropbox.Dropbox(usertoken)   
         print("[SUCCESS] dropbox account linked")
         campaign={}    
+            
         for entry in dbx.files_list_folder('/'+rootFolder.name).entries:     
             # entry here is the SKU
             if isinstance(entry,dropbox.files.FolderMetadata):
