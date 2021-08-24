@@ -25,7 +25,7 @@ class Interact_with_DB:
 
     def __init__(self):
         try:
-            db_path = str(pathlib.Path(__file__).parent.resolve())+'/database.db'
+            db_path = 'database.db'
             self.conn = sqlite3.connect(db_path)    
         except Exception as ex:
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
