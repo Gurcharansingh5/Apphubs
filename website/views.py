@@ -61,7 +61,8 @@ def integrate_db():
     if db_social_user:
         dbx = dropbox.Dropbox(db_social_user.access_token)
         for entry in dbx.files_list_folder("").entries:
-            root_folders.append(entry.name)
+            if isinstance(entry,dropbox.files.FolderMetadata):
+                root_folders.append(entry.name)
 
     return render_template("integrate-db.html",db_social_user=db_social_user,user=current_user,root_folders=root_folders)
 
