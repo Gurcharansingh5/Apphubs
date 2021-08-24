@@ -294,7 +294,6 @@ def get_video_creative_id_from_file(path,accessToken,ad_account_id):
 
 
 def main_cron():   
-
     db_obj = Interact_with_DB()
     users= db_obj.getUsersFromDBfile()
     logger.info("execution starts")
@@ -348,4 +347,4 @@ def main_cron():
                                 # user.last_runned = datetime.now()
                         else:
                             print('no campaigns to launch in '+root_folder.name )
-main_cron()
+# main_cron()
