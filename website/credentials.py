@@ -14,7 +14,7 @@ FB_CLIENT_SECRET=os.environ['FB_CLIENT_SECRET']
 FB_AUTHORIZATION_BASE_URL = "https://www.facebook.com/dialog/oauth"
 FB_TOKEN_URL = "https://graph.facebook.com/oauth/access_token"
 FB_SCOPE = ["email","ads_management"]
-URL = "https://e9636a010b2a.ngrok.io"
+URL = "https://adlauncher.herokuapp.com"
 
 
 
