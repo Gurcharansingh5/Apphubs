@@ -36,6 +36,7 @@ def logout():
 
 @auth.route("/loginurl")
 def googleLoginURL():
+    
     # Find out what URL to hit for Google login
     google_provider_cfg = get_google_provider_cfg()
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
