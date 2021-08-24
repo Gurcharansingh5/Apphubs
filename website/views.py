@@ -20,6 +20,7 @@ views = Blueprint('views', __name__)
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
+    
     fb_social_user = SocialDetails.query.filter_by(user_id=current_user.id,type='facebook',is_deleted=False).first()
     
     if fb_social_user:       
