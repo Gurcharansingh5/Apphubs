@@ -51,21 +51,22 @@ def findReadyFolderPaths(rootFolder,access_token):
                 for subEntry in dbx.files_list_folder('/'+rootFolder+'/'+entry.name).entries:
                     # subentry here is the folders inside SKU folder
                     if subEntry.name == 'READY':
+                        campaign_data = dbx.files_list_folder('/'+rootFolder+'/'+entry.name+'/'+subEntry.name).entries
+                        if campaign_data:
+                            for campaigns in dbx.files_list_folder('/'+rootFolder+'/'+entry.name+'/'+subEntry.name).entries:
+                                ready_campaign_path= '/'+rootFolder+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
+                                adset={}
+                                for adsets in dbx.files_list_folder(ready_campaign_path).entries:
+                                    if not adsets.name.endswith('.csv'):             
+                                        adcreative=[]
+                                        ready_adset_path = ready_campaign_path+'/'+adsets.name
+                                        for adcreatives in dbx.files_list_folder(ready_adset_path).entries:
+                                            adcreative.append(adcreatives.name)
+                                        adset[adsets.name] = adcreative
 
-                        for campaigns in dbx.files_list_folder('/'+rootFolder+'/'+entry.name+'/'+subEntry.name).entries:
-                            ready_campaign_path= '/'+rootFolder+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
-                            adset={}
-                            for adsets in dbx.files_list_folder(ready_campaign_path).entries:
-                                if not adsets.name.endswith('.csv'):             
-                                    adcreative=[]
-                                    ready_adset_path = ready_campaign_path+'/'+adsets.name
-                                    for adcreatives in dbx.files_list_folder(ready_adset_path).entries:
-                                        adcreative.append(adcreatives.name)
-                                    adset[adsets.name] = adcreative
-
-                                campaign[campaigns.name] = adset
-                                campaign[campaigns.name]['path'] = campaigns.path_display
-                                campaign[campaigns.name]['SKU'] = entry.name
+                                    campaign[campaigns.name] = adset
+                                    campaign[campaigns.name]['path'] = campaigns.path_display
+                                    campaign[campaigns.name]['SKU'] = entry.name
 
 
 
@@ -104,8 +105,5 @@ def ready_folder_exists(dbx,entry,subEntry):
                 if isinstance(subSubEntry,dropbox.files.FolderMetadata):
                     if subSubEntry.name == 'READY':
                         campaign_data = dbx.files_list_folder('/'+entry.name+'/'+subEntry.name+'/'+subSubEntry.name).entries
-                        print(entry.name,subEntry.name)
-                        print('******************************************')
-                        print(campaign_data)
                         if campaign_data:
                             return True
