@@ -1,3 +1,105 @@
-2021-08-27 14:10:23,917  * Debugger is active!
-2021-08-27 14:10:23,923  * Debugger PIN: 134-235-316
-2021-08-27 14:10:24,038  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-08-27 15:29:17,669  * Debugger is active!
+2021-08-27 15:29:17,674  * Debugger PIN: 134-235-316
+2021-08-27 15:29:17,885  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+2021-08-27 15:33:14,440 127.0.0.1 - - [27/Aug/2021 15:33:14] "GET /integrate_db HTTP/1.1" 200 -
+2021-08-27 15:33:15,625 127.0.0.1 - - [27/Aug/2021 15:33:15] "[36mGET /static/css/feather/feather.css HTTP/1.1[0m" 304 -
+2021-08-27 15:33:15,639 127.0.0.1 - - [27/Aug/2021 15:33:15] "[36mGET /static/css/mdi/css/materialdesignicons.min.css HTTP/1.1[0m" 304 -
+2021-08-27 15:33:15,856 127.0.0.1 - - [27/Aug/2021 15:33:15] "[36mGET /static/css/typicons/typicons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:33:15,865 127.0.0.1 - - [27/Aug/2021 15:33:15] "[36mGET /static/css/css/vendor.bundle.base.css HTTP/1.1[0m" 304 -
+2021-08-27 15:33:15,870 127.0.0.1 - - [27/Aug/2021 15:33:15] "[36mGET /static/css/simple-line-icons/css/simple-line-icons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:33:15,972 127.0.0.1 - - [27/Aug/2021 15:33:15] "[36mGET /static/css/ti-icons/css/themify-icons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:33:16,465 127.0.0.1 - - [27/Aug/2021 15:33:16] "[36mGET /static/css/vertical-layout-light/style.css HTTP/1.1[0m" 304 -
+2021-08-27 15:33:16,633 127.0.0.1 - - [27/Aug/2021 15:33:16] "[36mGET /static/css/select.dataTables.min.css HTTP/1.1[0m" 304 -
+2021-08-27 15:33:16,665 127.0.0.1 - - [27/Aug/2021 15:33:16] "[36mGET /static/js/vendor.bundle.base.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:16,722 127.0.0.1 - - [27/Aug/2021 15:33:16] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:16,772 127.0.0.1 - - [27/Aug/2021 15:33:16] "[36mGET /static/js/progressbar.js/progressbar.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:16,866 127.0.0.1 - - [27/Aug/2021 15:33:16] "[36mGET /static/js/off-canvas.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:17,413 127.0.0.1 - - [27/Aug/2021 15:33:17] "[36mGET /static/js/hoverable-collapse.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:17,505 127.0.0.1 - - [27/Aug/2021 15:33:17] "[36mGET /static/js/settings.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:17,505 127.0.0.1 - - [27/Aug/2021 15:33:17] "[36mGET /static/js/template.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:17,536 127.0.0.1 - - [27/Aug/2021 15:33:17] "[36mGET /static/js/todolist.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:17,652 127.0.0.1 - - [27/Aug/2021 15:33:17] "[36mGET /static/css/simple-line-icons/fonts/Simple-Line-Icons.woff2?v=2.4.0 HTTP/1.1[0m" 304 -
+2021-08-27 15:33:17,662 127.0.0.1 - - [27/Aug/2021 15:33:17] "[36mGET /static/css/mdi/fonts/materialdesignicons-webfont.woff2?v=3.9.97 HTTP/1.1[0m" 304 -
+2021-08-27 15:33:18,285 127.0.0.1 - - [27/Aug/2021 15:33:18] "[36mGET /static/js/typeahead.js/typeahead.bundle.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:18,317 127.0.0.1 - - [27/Aug/2021 15:33:18] "[36mGET /static/js/select2/select2.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:33:25,520 127.0.0.1 - - [27/Aug/2021 15:33:25] "[32mGET /dropboxlogin HTTP/1.1[0m" 302 -
+2021-08-27 15:34:34,134 Prepare oauth2 remote args {'code': '-MlD8PPh5_8AAAAAAAAAC9kFcY-OnWaqcOvfmI5jr7k', 'client_secret': 'kn7mpqs64v0ac8y', 'redirect_uri': None}
+2021-08-27 15:34:34,134 Request 'https://api.dropbox.com/1/oauth2/token' with 'POST' method
+2021-08-27 15:34:34,988 127.0.0.1 - - [27/Aug/2021 15:34:34] "[35m[1mGET /login/authorized?code=-MlD8PPh5_8AAAAAAAAAC9kFcY-OnWaqcOvfmI5jr7k HTTP/1.1[0m" 500 -
+2021-08-27 15:34:35,068 127.0.0.1 - - [27/Aug/2021 15:34:35] "GET /login/authorized?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2021-08-27 15:34:35,069 127.0.0.1 - - [27/Aug/2021 15:34:35] "GET /login/authorized?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2021-08-27 15:34:35,205 127.0.0.1 - - [27/Aug/2021 15:34:35] "GET /login/authorized?__debugger__=yes&cmd=resource&f=ubuntu.ttf HTTP/1.1" 200 -
+2021-08-27 15:34:35,254 127.0.0.1 - - [27/Aug/2021 15:34:35] "GET /login/authorized?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2021-08-27 15:34:35,318 127.0.0.1 - - [27/Aug/2021 15:34:35] "GET /login/authorized?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2021-08-27 15:35:27,591 127.0.0.1 - - [27/Aug/2021 15:35:27] "GET / HTTP/1.1" 200 -
+2021-08-27 15:35:27,786 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/css/vertical-layout-light/style.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,787 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/css/select.dataTables.min.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,813 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/js/vendor.bundle.base.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,826 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/css/mdi/css/materialdesignicons.min.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,840 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/css/ti-icons/css/themify-icons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,856 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/css/typicons/typicons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,865 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/css/simple-line-icons/css/simple-line-icons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,881 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/css/css/vendor.bundle.base.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,903 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/css/feather/feather.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,920 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/js/progressbar.js/progressbar.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,924 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,939 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/js/off-canvas.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,948 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/js/hoverable-collapse.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,983 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/js/template.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,988 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/js/settings.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:27,989 127.0.0.1 - - [27/Aug/2021 15:35:27] "[36mGET /static/js/todolist.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,008 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/typeahead.js/typeahead.bundle.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,024 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/select2/select2.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,100 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/feather/feather.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,104 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/mdi/css/materialdesignicons.min.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,116 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/ti-icons/css/themify-icons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,123 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/typicons/typicons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,154 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/simple-line-icons/css/simple-line-icons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,155 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/css/vendor.bundle.base.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,207 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/vertical-layout-light/style.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,230 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/simple-line-icons/fonts/Simple-Line-Icons.woff2?v=2.4.0 HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,253 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/mdi/fonts/materialdesignicons-webfont.woff2?v=3.9.97 HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,315 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/css/select.dataTables.min.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,367 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/template.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,458 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/vendor.bundle.base.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,458 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/progressbar.js/progressbar.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,466 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,489 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/off-canvas.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,497 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/settings.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,502 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/hoverable-collapse.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,504 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/todolist.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,528 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/typeahead.js/typeahead.bundle.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:28,538 127.0.0.1 - - [27/Aug/2021 15:35:28] "[36mGET /static/js/select2/select2.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:29,527 127.0.0.1 - - [27/Aug/2021 15:35:29] "[32mGET /dropboxlogin HTTP/1.1[0m" 302 -
+2021-08-27 15:35:34,986 Prepare oauth2 remote args {'code': '-MlD8PPh5_8AAAAAAAAADHO-z9nqNrYM9eKGm9imG0Q', 'client_secret': 'kn7mpqs64v0ac8y', 'redirect_uri': 'http://127.0.0.1:5000/login/authorized'}
+2021-08-27 15:35:34,986 Request 'https://api.dropbox.com/1/oauth2/token' with 'POST' method
+2021-08-27 15:35:36,396 Starting new HTTPS connection (1): api.dropboxapi.com:443
+2021-08-27 15:35:37,212 https://api.dropboxapi.com:443 "POST /2/users/get_current_account HTTP/1.1" 200 None
+2021-08-27 15:35:37,314 127.0.0.1 - - [27/Aug/2021 15:35:37] "[32mGET /login/authorized?code=-MlD8PPh5_8AAAAAAAAADHO-z9nqNrYM9eKGm9imG0Q HTTP/1.1[0m" 302 -
+2021-08-27 15:35:37,341 127.0.0.1 - - [27/Aug/2021 15:35:37] "GET / HTTP/1.1" 200 -
+2021-08-27 15:35:37,857 127.0.0.1 - - [27/Aug/2021 15:35:37] "[36mGET /static/css/simple-line-icons/fonts/Simple-Line-Icons.woff2?v=2.4.0 HTTP/1.1[0m" 304 -
+2021-08-27 15:35:37,874 127.0.0.1 - - [27/Aug/2021 15:35:37] "[36mGET /static/css/mdi/fonts/materialdesignicons-webfont.woff2?v=3.9.97 HTTP/1.1[0m" 304 -
+2021-08-27 15:35:41,463 Request to files/list_folder
+2021-08-27 15:35:41,467 Starting new HTTPS connection (1): api.dropboxapi.com:443
+2021-08-27 15:35:42,117 https://api.dropboxapi.com:443 "POST /2/files/list_folder HTTP/1.1" 200 None
+2021-08-27 15:35:42,121 127.0.0.1 - - [27/Aug/2021 15:35:42] "GET /integrate_db HTTP/1.1" 200 -
+2021-08-27 15:35:42,229 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/feather/feather.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,239 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/mdi/css/materialdesignicons.min.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,241 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/ti-icons/css/themify-icons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,248 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/typicons/typicons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,265 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/simple-line-icons/css/simple-line-icons.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,272 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/css/vendor.bundle.base.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,283 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/vertical-layout-light/style.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,285 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/select.dataTables.min.css HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,319 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/vendor.bundle.base.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,460 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/simple-line-icons/fonts/Simple-Line-Icons.woff2?v=2.4.0 HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,464 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/css/mdi/fonts/materialdesignicons-webfont.woff2?v=3.9.97 HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,530 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/progressbar.js/progressbar.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,588 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/settings.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,608 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/template.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,637 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/hoverable-collapse.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,680 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/off-canvas.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,702 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,736 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/todolist.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,742 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/typeahead.js/typeahead.bundle.min.js HTTP/1.1[0m" 304 -
+2021-08-27 15:35:42,762 127.0.0.1 - - [27/Aug/2021 15:35:42] "[36mGET /static/js/select2/select2.min.js HTTP/1.1[0m" 304 -

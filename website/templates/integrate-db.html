@@ -40,19 +40,24 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Dropbox Settings</h4>
-                    <form method="POST" action="/integrate_db">
-                        <div class="form-group">
-                            <label>Select root folder for campaigns files</label>
-                            <select class="form-select" aria-label="Default select example" name='root_folder'
-                                onchange="this.form.submit()">
-                                <option value="" selected disabled hidden>Select Root folder</option>
-                                {% for folder in root_folders %}
-                                <option value="{{folder}}">{{folder}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </form>
-                    <b>Choosed root folder :</b>{{user.root_folder}}
+                    {% if root_folders %}
+                        <form method="POST" action="/integrate_db">
+                            <div class="form-group">                            
+
+                                <label>Select root folder for campaigns files</label>
+                                <select class="form-select" aria-label="Default select example" name='root_folder'
+                                    onchange="this.form.submit()">
+                                    <option value="" selected disabled hidden>Select Root folder</option>
+                                    {% for folder in root_folders %}
+                                    <option value="{{folder}}">{{folder}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form>
+                        <b>Choosed root folder :</b>{{user.root_folder}}
+                    {% else %}
+                    There are no root folders that contain READY folders. Please create one.
+                    {% endif %}
                 </div>
             </div>
         </div>

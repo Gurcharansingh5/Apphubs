@@ -1,6 +1,7 @@
 # INTERNAL IMPORTS
 import csv
 import os
+from re import T
 import requests
 
 # EXTERNAL IMPORTS
@@ -50,6 +51,7 @@ def findReadyFolderPaths(rootFolder,access_token):
                 for subEntry in dbx.files_list_folder('/'+rootFolder+'/'+entry.name).entries:
                     # subentry here is the folders inside SKU folder
                     if subEntry.name == 'READY':
+
                         for campaigns in dbx.files_list_folder('/'+rootFolder+'/'+entry.name+'/'+subEntry.name).entries:
                             ready_campaign_path= '/'+rootFolder+'/'+entry.name+'/'+subEntry.name+'/'+campaigns.name
                             adset={}
@@ -95,4 +97,15 @@ def fb_token_valid(access_token):
     print(r)
     return True if 'id' in r else False
 
-    
+def ready_folder_exists(dbx,entry,subEntry):
+    if isinstance(subEntry,dropbox.files.FolderMetadata):
+        for subSubEntry in dbx.files_list_folder('/'+entry.name+'/'+subEntry.name).entries:
+            # subSubEntry here is the folders inside SKU folder i.e READY/LAUNCHED
+                if isinstance(subSubEntry,dropbox.files.FolderMetadata):
+                    if subSubEntry.name == 'READY':
+                        campaign_data = dbx.files_list_folder('/'+entry.name+'/'+subEntry.name+'/'+subSubEntry.name).entries
+                        print(entry.name,subEntry.name)
+                        print('******************************************')
+                        print(campaign_data)
+                        if campaign_data:
+                            return True

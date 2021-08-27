@@ -1,7 +1,7 @@
 # INNER IMPORTS
 from .models import User,SocialDetails
 from . import db
-from website.helperFunctions import findReadyFolderPaths,fb_token_valid,launch_campaign_script,getRowsFromReadyPath
+from website.helperFunctions import findReadyFolderPaths,fb_token_valid,launch_campaign_script,getRowsFromReadyPath,ready_folder_exists
 
 # INTERNAL IMPORTS
 import os
@@ -31,7 +31,8 @@ def home():
     rows=[]
     db_social_user = SocialDetails.query.filter_by(user_id=current_user.id,type='dropbox',is_deleted=False).first()
     if db_social_user:
-        readyfolderpaths = findReadyFolderPaths(rootFolder=current_user.root_folder,access_token=db_social_user.access_token)    
+        readyfolderpaths = findReadyFolderPaths(rootFolder=current_user.root_folder,access_token=db_social_user.access_token)   
+
         if readyfolderpaths :
             rows = getRowsFromReadyPath(readyfolderpaths,access_token=db_social_user.access_token,count=3)           
         print(rows)
@@ -61,8 +62,15 @@ def integrate_db():
     if db_social_user:
         dbx = dropbox.Dropbox(db_social_user.access_token)
         for entry in dbx.files_list_folder("").entries:
+            #entry here is the root folders
             if isinstance(entry,dropbox.files.FolderMetadata):
-                root_folders.append(entry.name)
+                for subEntry in dbx.files_list_folder('/'+entry.name).entries:
+                    # subentry here is the SKU folders inside root folder
+                    if ready_folder_exists(dbx,entry=entry,subEntry=subEntry):
+                        #checks for ready folder inside SKU folder
+                        root_folders.append(entry.name)
+                        break                 
+                        
 
     return render_template("integrate-db.html",db_social_user=db_social_user,user=current_user,root_folders=root_folders)
 
