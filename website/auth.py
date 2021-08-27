@@ -161,7 +161,7 @@ def facebookCallback():
 
 @auth.route('/dropboxlogin')
 def dropboxLoginURL():
-    return credentials.dropbox.authorize(callback='http://127.0.0.1:5000'+'/login/authorized')
+    return credentials.dropbox.authorize(callback=URL+'/login/authorized')
     
 @auth.route('/login/authorized')
 def dropboxCallback():
