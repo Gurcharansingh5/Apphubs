@@ -17,7 +17,6 @@ FB_SCOPE = ["email","ads_management"]
 URL = "https://adlauncher.herokuapp.com"
 
 
-
 # DROPBOX CREDENTIALS
 DROPBOX_CONSUMER_KEY=os.environ['DROPBOX_CONSUMER_KEY']
 DROPBOX_CONSUMER_SECRET=os.environ['DROPBOX_CONSUMER_SECRET']

@@ -12,7 +12,7 @@ from datetime import datetime
 from dateutil import tz
 
 # EXTERNAL IMPORTS
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session,flash
 from flask_login import login_user, login_required, logout_user, current_user
 from oauthlib.oauth2 import WebApplicationClient
 import requests_oauthlib
@@ -130,33 +130,38 @@ def facebookCallback():
 	# we need to apply a fix for Facebook here
     facebook = facebook_compliance_fix(facebook)
     token = facebook.fetch_token(FB_TOKEN_URL, client_secret=FB_CLIENT_SECRET, authorization_response=request.url)
-
+    print("asdssdsafsdafdafsdfsdf")
+    print(token)
     # Fetch a protected resource, i.e. user profile, via Graph API
     facebook_user_data = facebook.get("https://graph.facebook.com/me?fields=id,name,email,picture{url}").json()
+    
+    if not 'email' in facebook_user_data:
+        flash('Please Login with a valid Facebook Ad Account.', category='error') 
 
-    # get current time
-    from_zone = tz.tzutc()
-    to_zone = tz.tzlocal()
-    utc = datetime.utcnow()
-    utc = utc.replace(tzinfo=from_zone)
-    central = utc.astimezone(to_zone)
+    else:
+        # get current time
+        from_zone = tz.tzutc()
+        to_zone = tz.tzlocal()
+        utc = datetime.utcnow()
+        utc = utc.replace(tzinfo=from_zone)
+        central = utc.astimezone(to_zone)
 
-    new_social_user = SocialDetails(user_id = current_user.id,
-                            type = 'facebook',
-                            email = facebook_user_data["email"],
-                            username = facebook_user_data["name"],
-                            pic_url = facebook_user_data.get("picture", {}).get("data", {}).get("url"),
-                            access_token = token['access_token'],
-                            last_logged_in = central
-                            )
-    db.session.add(new_social_user)
-    db.session.commit()
+        new_social_user = SocialDetails(user_id = current_user.id,
+                                type = 'facebook',
+                                email = facebook_user_data["email"],
+                                username = facebook_user_data["name"],
+                                pic_url = facebook_user_data.get("picture", {}).get("data", {}).get("url"),
+                                access_token = token['access_token'],
+                                last_logged_in = central
+                                )
+        db.session.add(new_social_user)
+        db.session.commit()
 
     return redirect(url_for('views.home'))
 
 @auth.route('/dropboxlogin')
 def dropboxLoginURL():
-    return credentials.dropbox.authorize(callback=URL+'/login/authorized')
+    return credentials.dropbox.authorize(callback='http://127.0.0.1:5000'+'/login/authorized')
     
 @auth.route('/login/authorized')
 def dropboxCallback():
@@ -180,12 +185,12 @@ def dropboxCallback():
     utc = datetime.utcnow()
     utc = utc.replace(tzinfo=from_zone)
     central = utc.astimezone(to_zone)
-
+    
     new_social_user = SocialDetails(user_id = current_user.id,
                         type = 'dropbox',
                         email = dropbox_user_data["email"],
                         username = dropbox_user_data['name']['display_name'],
-                        pic_url = dropbox_user_data['profile_photo_url'],
+                        pic_url = dropbox_user_data.get('profile_photo_url','https://image.flaticon.com/icons/png/512/149/149071.png'),
                         access_token = dropbox_access_token,
                         last_logged_in = central.replace(microsecond=0)
                         )
