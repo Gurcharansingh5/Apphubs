@@ -5,7 +5,7 @@ import os
 from flask_login import LoginManager
 from flask_oauthlib.client import OAuth
 from . import credentials
-from .credentials import DROPBOX_CONSUMER_KEY,DROPBOX_CONSUMER_SECRET
+from .credentials import DROPBOX_CONSUMER_KEY,DROPBOX_CONSUMER_SECRET,DATABASE_URL
 # from flask_crontab import Crontab
 from .cronjob import main_cron
 db = SQLAlchemy()
@@ -15,7 +15,7 @@ db = SQLAlchemy()
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjahkjshkjdhjs'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://dgowsdimwesqsc:00a7671e61c13f04520715be7689e7e38b7b87dfee0f5f8a30584fb02093ea6f@ec2-52-86-25-51.compute-1.amazonaws.com:5432/dfldsj5rnos04d'
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
     # crontab.init_app(app)
