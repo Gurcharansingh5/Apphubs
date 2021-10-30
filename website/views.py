@@ -141,6 +141,10 @@ def launch_campaign():
         return redirect(url_for('views.home'))
 
 
+@views.route('/privacy-policy')
+def privacy_policy():
+    return render_template("privacy-policy.html")
+
 
 
 
